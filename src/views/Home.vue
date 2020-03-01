@@ -52,7 +52,7 @@ export default {
   width: 200px;
   height: calc(100% - 50px);
   border-right: 1px solid rgb(59, 60, 64);
-  background: rgb(38, 40, 44);
+  background: rgb(25, 27, 31);
 }
 #content {
   padding-top: 50px;
