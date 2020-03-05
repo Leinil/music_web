@@ -1,13 +1,15 @@
 <template>
   <div id="homeContainer">
-    <div id="top">
-      <HomePageTopbar />
-    </div>
-    <div id="side">
-      <HomaPageSidebar />
+    <div>
+      <div id="top">
+        <HomePageTopbar />
+      </div>
+      <div id="side">
+        <HomaPageSidebar />
+      </div>
     </div>
     <div id="content">
-      <HomePageContent />
+      <router-view></router-view>
     </div>
   </div>
 </template>
@@ -16,14 +18,14 @@
 // @ is an alias to /src
 import HomaPageSidebar from "@/views/HomePageSidebar.vue";
 import HomePageTopbar from "@/views/HomePageTopbar.vue";
-import HomePageContent from "@/views/HomePageContent.vue";
+import InitContent from "@/views/InitContentPage.vue";
+
 
 export default {
   name: "home",
   components: {
     HomaPageSidebar,
     HomePageTopbar,
-    HomePageContent
   },
   data() {
     return {};

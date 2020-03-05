@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import About from '../views/About.vue'
+import sideContent from '../views/showSideContent.vue';
+import InitContent from "@/views/InitContentPage.vue";
 
 Vue.use(VueRouter)
 
@@ -9,13 +10,11 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home,
-    children:[
-      {
-        path:'test',
-        component:About
-      }
-    ]
+    component:InitContent,
+  },
+  {
+    path: '/side/:type',
+    component:sideContent
   },
   // {
   //   path: '/about',

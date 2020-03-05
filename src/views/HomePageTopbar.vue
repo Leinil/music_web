@@ -1,6 +1,6 @@
 <template>
   <div id="topbar">
-    <div class="wYIcon iconTitle"></div>
+    <div class="wYIcon iconTitle" @click="goBackToHome()"></div>
     <div class="left flexCenterBoth">
       <i class="el-icon-arrow-left addColorBorder"></i>
       <i class="el-icon-arrow-right addColorBorder"></i>
@@ -28,14 +28,20 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import HomePageContent from "@/components/HomePageContent.vue";
+import router from '../router';
 
 @Component
-export default class HomePageTopbar extends Vue {}
+export default class HomePageTopbar extends Vue {
+  goBackToHome(){
+    router.push('/')
+  }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
 .wYIcon {
+  cursor: pointer;
   background-image: url(https://s2.music.126.net/style/web2/img/frame/topbar.png?7d1d5d8e4f00cc5d6143ca737b681a88);
   background-repeat: no-repeat;
 }

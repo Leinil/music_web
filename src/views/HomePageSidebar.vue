@@ -3,32 +3,32 @@
     <div class="sideContentBlock">
       <div class="sideTitle">推荐</div>
       <div class="sideItems">
-        <a href="#findMusic" id="findMusic">
+        <router-link to="/side/findMusic" id="findMusic">
           <i class="el-icon-headset"></i> 发现音乐
-        </a>
-        <a href="#selfFM" id="selfFM">
+        </router-link>
+        <router-link to="/side/selfFM" id="selfFM">
           <i class="el-icon-mic"></i>私人FM
-        </a>
-        <a href="#lookLive" id="lookLive">
+        </router-link>
+        <router-link to="/side/lookLive" id="lookLive">
           <i class="el-icon-video-camera-solid"></i>LOOK直播
-        </a>
-        <a href="#video" id="video">
+        </router-link>
+        <router-link to="/side/video" id="video">
           <i class="el-icon-video-camera"></i>视频
-        </a>
-        <a href="#friend" id="friend">
+        </router-link>
+        <router-link to="/side/friend" id="friend">
           <i class="el-icon-user"></i>朋友
-        </a>
+        </router-link>
       </div>
     </div>
     <div class="sideContentBlock">
       <div class="sideTitle">我的音乐</div>
       <div class="sideItems">
-        <a href="#localMusic" id="localMusic">
+        <router-link to="/side/localMusic" id="localMusic">
           <i class="el-icon-service"></i>本地音乐
-        </a>
-        <a href="#download" id="download">
+        </router-link>
+        <router-link to="/side/download" id="download">
           <i class="el-icon-download"></i>下载管理
-        </a>
+        </router-link>
       </div>
     </div>
     <div class="sideContentBlock">
@@ -39,9 +39,41 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import router from "../router";
 
 @Component
-export default class HomePageSidebar extends Vue {}
+export default class HomePageSidebar extends Vue {
+  name: string = "sideBar";
+  selected: string = ""; //选择的侧边栏
+  data() {
+    return {};
+  }
+
+  mounted() {
+    let itemsPart = document.getElementsByClassName("sideItems");
+    let itemsArray = Array.prototype.slice.call(itemsPart, 0);
+    const that = this;
+    itemsArray.forEach((element: Element) => {
+      element.addEventListener("click", function(e: Event) {
+        let obj: { [name: string]: any } = {};
+        var event = e || window.event;
+        var target = event.target || event.srcElement || obj;
+        // 判断是否匹配目标元素
+        if (target.nodeName.toLocaleLowerCase() === "a") {
+          if (that.selected == target.id) return;
+          target.classList.add("checked");
+          if (that.selected != "") {
+            let obj: any = {};
+            const oldTarget = document.getElementById(that.selected) || obj;
+            oldTarget.classList.remove("checked");
+          }
+          that.selected = target.id;
+          // that.$router.push(`/side-${target.id}`)
+        }
+      });
+    });
+  }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -72,18 +104,17 @@ export default class HomePageSidebar extends Vue {}
   color: white;
   cursor: pointer;
 }
-.sideItems a:target {
+.checked {
   background: rgb(38, 40, 44);
-  outline: none; // 去除选中状态边
 }
-.sideItems a:target::before {
+.checked::before {
   position: absolute;
   left: 0;
   top: 0;
   height: 100%;
   background: red;
   width: 1%;
-  content: ''
+  content: "";
 }
 .sideItems a:last-child {
   margin-bottom: 19px;

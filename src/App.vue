@@ -1,22 +1,27 @@
 <template>
-  <div id="app" >
-    <router-view />
+  <div id="app">
+    <Home/>
   </div>
 </template>
 
 <script>
+import Home from "@/views/Home.vue";
 export default {
   name: "app",
+  components: {
+    Home
+  }
 };
 </script>
 
 <style scope>
-html,body{
+html,
+body {
   margin: 0;
   height: 100%;
   min-width: 1024px;
   overflow: hidden;
-  background: rgb(25,27,31);
+  background: rgb(25, 27, 31);
 }
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;

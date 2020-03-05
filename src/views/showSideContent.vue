@@ -1,6 +1,6 @@
 <template>
   <div id="contentContainer">
-    这里是侧边栏
+    asdfajsdfasjdf
     <HelloWorld />
   </div>
 </template>
