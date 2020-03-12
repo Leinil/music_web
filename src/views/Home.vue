@@ -20,12 +20,11 @@ import HomaPageSidebar from "@/views/HomePageSidebar.vue";
 import HomePageTopbar from "@/views/HomePageTopbar.vue";
 import InitContent from "@/views/InitContentPage.vue";
 
-
 export default {
   name: "home",
   components: {
     HomaPageSidebar,
-    HomePageTopbar,
+    HomePageTopbar
   },
   data() {
     return {};
@@ -58,8 +57,8 @@ export default {
 }
 #content {
   padding-top: 50px;
-  padding-left: 15%;
-  width: 100%;
+  padding-left: 200px;
+  width: calc(100vw - 200px);
   height: 100%;
 }
 </style>

@@ -3,7 +3,7 @@
     <div class="sideContentBlock">
       <div class="sideTitle">推荐</div>
       <div class="sideItems">
-        <router-link to="/side/findMusic" id="findMusic">
+        <router-link to="/side/findMusic" id="findMusic" class="checked">
           <i class="el-icon-headset"></i> 发现音乐
         </router-link>
         <router-link to="/side/selfFM" id="selfFM">
@@ -87,7 +87,7 @@ export default class HomePageSidebar extends Vue {
 }
 .sideContentBlock {
   .sideTitle {
-    margin: 6px 0px 6px 10px;
+    margin: 6px 0px 6px 5px;
   }
 }
 
