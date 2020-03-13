@@ -25,13 +25,16 @@
       </div>
       <div class="recommendSongs">
         <div v-for="(item,index) in recommendSongs" :key="index" class="recommendBorder">
-          <div class="playCount">
-            <i class="el-icon-headset"></i>
-            {{getPlayCount(item.playCount)}}
-          </div>
           <img :src="item.picUrl" />
           <span>{{item.name}}</span>
-          <div class="hoverMan">{{item.copywriter}}</div>
+          <div class="hoverBorder">
+            <div class="playCount">
+              <i class="el-icon-headset"></i>
+              {{getPlayCount(item.playCount)}}
+            </div>
+            <div>{{item.copywriter}}</div>
+            <div class="playIcon"></div>
+          </div>
         </div>
       </div>
       <div class="title">
@@ -46,6 +49,7 @@
 </template>
 <script>
 import { Loading } from "element-ui";
+import playBar from "../../src/assets/playbar.png";
 export default {
   name: "home",
   data() {
@@ -85,6 +89,9 @@ export default {
           vm.recommendSongs = res.result;
         }
       });
+    //推荐歌单获取2434388371
+    fetch("http://localhost:3000/song/detail?ids=441491828");
+    fetch("http://localhost:3000/playlist/detail?id=2434388371");
     //添加对于顶部tab的事件监听
     let itemsPart = document.getElementById("topTabs");
     const that = this;
@@ -133,44 +140,77 @@ export default {
     padding-bottom: 19%;
     position: relative;
     margin: 10px 0px 65px 0px;
-    
-    div:last-of-type {
-      position: absolute;
-      width: 100%;
-      height: 120%;
-      color: white;
-      top: -20%;
-      left: 0;
-      z-index: 999;
-      transition: all 0.2s;
-      transition-timing-function: cubic-bezier(0, 0, 1, 1);
-    }
-    .hoverMan:hover{
-      top: 0;
-      height: 100%;
+
+    .hoverBorder {
       cursor: pointer;
-    }
-    .playCount {
-      font-size: 10px;
       position: absolute;
       width: 100%;
-      text-align: right;
-      color: white;
-      padding: 2px 10px;
-      z-index: 9;
-      background-image: linear-gradient(
-        90deg,
-        transparent 50%,
-        rgba(0, 0, 0, 0.5)
-      );
-      box-sizing: border-box;
-      i {
-        width: 10px;
-        height: 10px;
-        margin-right: 2px;
+      height: 100%;
+      overflow: hidden;
+      .playCount {
+        font-size: 10px;
+        position: absolute;
+        width: 100%;
+        text-align: right;
+        color: white;
+        padding: 2px 10px;
+        z-index: 9;
+        transition: all 0.2s;
+        transition-delay: 0.5s;
+        transition-timing-function: cubic-bezier(0, 0, 1, 1);
+        background-image: linear-gradient(
+          90deg,
+          transparent 50%,
+          rgba(0, 0, 0, 0.5)
+        );
+        box-sizing: border-box;
+        i {
+          width: 10px;
+          height: 10px;
+          margin-right: 2px;
+        }
+      }
+      div:nth-child(2) {
+        position: absolute;
+        top: -30%;
+        text-align: left;
+        color: white;
+        font-size: 13px;
+        width: 100%;
+        padding: 9px;
+        transition: all 0.2s;
+        transition-delay: 0.5s;
+        transition-timing-function: cubic-bezier(0, 0, 1, 1);
+        box-sizing: border-box;
+        background-color: rgba(32, 32, 32, 0.8);
+        z-index: 99;
+      }
+      .playIcon {
+        opacity: 0;
+        width: 36px;
+        height: 36px;
+        // border:1px solid white;
+        position: absolute;
+        right: 2%;
+        bottom: 2%;
+        background-image: url(../../src/assets/playbar.png);
+        background-repeat: no-repeat;
+        background-position: 0 -204px;
+        // background-size: 100% 100%;
       }
     }
-    span {
+    .hoverBorder:hover {
+      .playCount {
+        opacity: 0;
+      }
+      :nth-child(2) {
+        top: 0;
+      }
+      .playIcon {
+        opacity: 0.7;
+      }
+    }
+    > span {
       position: absolute;
       left: 0;
       top: 102%;
