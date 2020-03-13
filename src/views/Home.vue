@@ -4,11 +4,6 @@
       <div id="top">
         <HomePageTopbar />
       </div>
-      <div id="side">
-        <HomaPageSidebar />
-      </div>
-    </div>
-    <div id="content">
       <router-view></router-view>
     </div>
   </div>
@@ -16,15 +11,11 @@
 
 <script>
 // @ is an alias to /src
-import HomaPageSidebar from "@/views/HomePageSidebar.vue";
 import HomePageTopbar from "@/views/HomePageTopbar.vue";
-import InitContent from "@/views/InitContentPage.vue";
-
 export default {
   name: "home",
   components: {
-    HomaPageSidebar,
-    HomePageTopbar
+    HomePageTopbar,
   },
   data() {
     return {};
@@ -45,20 +36,5 @@ export default {
   top: 0;
   left: 0;
   border-bottom: 2px solid rgb(151, 24, 24);
-}
-#side {
-  position: absolute;
-  top: 50px;
-  left: 0px;
-  width: 200px;
-  height: calc(100% - 50px);
-  border-right: 1px solid rgb(59, 60, 64);
-  background: rgb(25, 27, 31);
-}
-#content {
-  padding-top: 50px;
-  padding-left: 200px;
-  width: calc(100vw - 200px);
-  height: 100%;
 }
 </style>
