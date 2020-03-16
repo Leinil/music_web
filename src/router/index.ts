@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import initHome from '../views/InitHome.vue'
-import sideContent from '../views/showSideContent.vue';
-import InitContent from "@/views/InitContentPage.vue";
-import VideoContent from '@/views/VideoContent.vue';
+import initHome from '@/views/InitHome.vue'
+import SideContent from '@/views/showSideContent.vue';
+import FindMusicIndex from "@/views/musicContentPages/finMusic/index.vue";
+import VideoContent from '@/views/showVideoContent.vue';
 
 //总体路由设计： 除了最上层的导航栏固定外 根据页面布局分为两类 
 //1.歌曲类 ：歌曲类的内容左侧为功能导航栏 根据初始界面和功能切换暂时 右侧内容
@@ -19,11 +19,11 @@ const routes = [
     children: [
       {
         path: 'index',
-        component: InitContent
+        component: FindMusicIndex
       },
       {
         path: '/side/:type',
-        component: sideContent
+        component: SideContent
       },
     ]
   },

@@ -49,7 +49,6 @@
 </template>
 <script>
 import { Loading } from "element-ui";
-import playBar from "../../src/assets/playbar.png";
 export default {
   name: "home",
   data() {
@@ -193,7 +192,7 @@ export default {
         position: absolute;
         right: 2%;
         bottom: 2%;
-        background-image: url(../../src/assets/playbar.png);
+        background-image: url(../../../../src/assets/playbar.png);
         background-repeat: no-repeat;
         background-position: 0 -204px;
         // background-size: 100% 100%;
