@@ -24,7 +24,7 @@
         </span>
       </div>
       <div class="recommendSongs">
-        <div v-for="(item,index) in recommendSongs" :key="index" class="recommendBorder">
+        <div v-for="(item,index) in recommendSongs" :key="index" class="recommendBorder" @click="goToSongSheet(item.id)">
           <img :src="item.picUrl" />
           <span>{{item.name}}</span>
           <div class="hoverBorder">
@@ -67,7 +67,7 @@ export default {
       background: "rgba(25, 27, 31, 1)"
     });
     const vm = this;
-    //滚动信息获取
+    //轮播信息获取
     fetch("http://localhost:3000/personalized/privatecontent")
       .then(res => {
         return Promise.resolve(res.json());
@@ -119,6 +119,9 @@ export default {
       let str;
       num / 100000 > 0 ? (str = `${(num / 10000).toFixed()}万`) : (str = num);
       return str;
+    },
+    goToSongSheet(id){
+       this.$router.push(`/side/songSheet/${id}`)
     }
   },
   watch: {}
