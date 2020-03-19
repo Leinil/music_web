@@ -8,17 +8,19 @@
         <div class="sheet-info">
           <div class="sheet-name">
             <span>歌单</span>
-            <div>{{detailInfo.playlist.name}}</div>
+            <div>
+              <span>{{detailInfo.playlist.name}}</span>
+            </div>
           </div>
           <div class="num-info">
             <div>
               歌曲数
-              <div>51</div>
+              <div>{{detailInfo.playlist.trackCount}}</div>
             </div>
             <div class="line"></div>
             <div>
               播放数
-              <div>53万</div>
+              <div>{{getPlayCount(detailInfo.playlist.playCount)}}</div>
             </div>
           </div>
         </div>
@@ -45,8 +47,17 @@
             <i class="el-icon-download"></i> 下载全部
           </div>
         </div>
-        <div class="tags"></div>
-        <div class="brief"></div>
+        <div class="tags">
+          标签:
+          <span v-for="(item,index) in detailInfo.playlist.tags" :key="index">{{item}}</span>
+        </div>
+        <div class="brief">
+          简介:
+          <span v-html="getReduceLines(detailInfo.playlist.description)" v-if="desLines>1&&up"></span>
+          <span v-html="getTotalLines(detailInfo.playlist.description)" v-if="!up"></span>
+          <i class="el-icon-arrow-down icon_bref" v-if="desLines>1&&up" @click="changeUpState"></i>
+          <i class="el-icon-arrow-up icon_bref" v-if="desLines>1&&!up" @click="changeUpState"></i>
+        </div>
       </div>
     </div>
     <div></div>
@@ -58,6 +69,9 @@ import moment from "moment";
 export default {
   data() {
     return {
+      //up用来判断简介内容多行是，扩展图标朝向
+      up: false,
+      desLines: 0,
       detailInfo: {
         playlist: {
           creator: {}
@@ -78,12 +92,45 @@ export default {
       .then(function(res) {
         if (res.code === 200) {
           vm.detailInfo = res;
+          vm.checkLines(res.playlist.description);
         }
       });
   },
   methods: {
     getCreatTime(time) {
       return moment(time).format("YYYY-MM-DD");
+    },
+    getPlayCount(number) {
+      return number / 10000 > 0 ? `${parseInt(number / 10000)}万` : number;
+    },
+    changeUpState() {
+      this.up = !this.up;
+    },
+    //需要记录一下换行符的个数
+    checkLines(str) {
+      const reg = /(\r\n|\n|\r)/;
+      let num = 0;
+      while (str.match(reg) != null) {
+        this.desLines++;
+        str = str.replace(/(\r\n|\n|\r)/, "<br />");
+        num++;
+        if(num>1){
+          this.up=true;
+        }
+      }
+    },
+    getTotalLines(str) {
+      return str.replace(/(\r\n|\n|\r)/gm, "<br />");
+    },
+    //当换行数大于1（也就是说至少有三行）
+    getReduceLines(str) {
+      let first_str = str.replace(/(\r\n|\n|\r)/gm, "<br />");
+      let str_arr = first_str.split("<br />");
+      let res = "";
+      for (let i = 0; i < 2; i++) {
+        res += str_arr[i] + "<br />";
+      }
+      return res;
     }
   }
 };
@@ -107,12 +154,12 @@ export default {
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
     }
   }
   .info-list {
     color: rgb(220, 221, 228);
     width: 100%;
+    text-align: left;
     > div {
       margin-bottom: 10px;
     }
@@ -129,7 +176,7 @@ export default {
         align-items: center;
         > span {
           font-size: 6px;
-          color: red;
+          color: rgb(201, 41, 41);
           border: 1px solid red;
           border-radius: 3px;
           padding: 2px 5px;
@@ -177,7 +224,27 @@ export default {
         margin-right: 10px;
       }
       > div:first-child {
-        background-color: red;
+        background-color: rgb(201, 41, 41);
+      }
+    }
+    .tags {
+      font-size: 12px;
+      > span {
+        color: rgb(44, 122, 209);
+      }
+      :not(:last-child)::after {
+        content: "/";
+        color: white;
+      }
+    }
+    .brief {
+      font-size: 12px;
+      position: relative;
+      .icon_bref {
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        right: 0;
       }
     }
   }
