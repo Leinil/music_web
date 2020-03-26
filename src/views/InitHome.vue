@@ -16,7 +16,7 @@ import HomaPageSidebar from "@/views/HomePageSidebar.vue";
 export default {
   name: "home",
   components: {
-    HomaPageSidebar,
+    HomaPageSidebar
   },
   data() {
     return {};
@@ -39,6 +39,7 @@ export default {
   padding-top: 50px;
   padding-left: 200px;
   width: calc(100vw - 200px);
-  height: 100%;
+  height: calc(100vh - 50px);
+  overflow: auto;
 }
 </style>

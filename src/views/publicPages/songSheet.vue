@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="song-sheet-border">
     <div class="top">
       <div class="img-border">
         <img :src="detailInfo.playlist.coverImgUrl" />
@@ -60,21 +60,87 @@
         </div>
       </div>
     </div>
-    <div></div>
+    <div class="songList">
+      <div class="songList-top">
+        <div class="song-list-title">
+          <a id="song-list" href="#song-list">歌曲列表</a>
+          <a id="comment" href="#comment">评论({{commentNums}})</a>
+          <a id="collection" href="#collection">收藏者</a>
+        </div>
+        <div class="songList-search">
+          <el-input v-model="input" placeholder="搜索歌单音乐" size="mini"></el-input>
+          <i class="el-icon-search serchIcon"></i>
+        </div>
+      </div>
+      <div class="songList-table">
+        <div class="table-item">
+          <div id="index">
+            <div class="table-title" id="blackDiv"></div>
+            <div
+              v-for="(item,index) in songList"
+              :key="index"
+              :class="index%2==0?'':'table-white'"
+            >{{getIndex(index)}}</div>
+          </div>
+          <div id="action">
+            <div class="table-title">操作</div>
+            <div v-for="(item,index) in songList" :key="index" :class="index%2==0?'':'table-white'">
+              <i class="el-icon-download"></i>
+            </div>
+          </div>
+          <div id="title">
+            <div class="table-title">音乐标题</div>
+            <div
+              v-for="(item,index) in songList"
+              :key="index"
+              :class="index%2==0?'':'table-white'"
+            >{{item.name}}</div>
+          </div>
+          <div id="songer">
+            <div class="table-title">歌手</div>
+            <div
+              v-for="(item,index) in songList"
+              :key="index"
+              :class="index%2==0?'':'table-white'"
+            >{{getSongerName(item.ar)}}</div>
+          </div>
+          <div id="album">
+            <div class="table-title">专辑</div>
+            <div
+              v-for="(item,index) in songList"
+              :key="index"
+              :class="index%2==0?'':'table-white'"
+            >{{item.al.name}}</div>
+          </div>
+          <div id="time">
+            <div class="table-title-last">时长</div>
+            <div
+              v-for="(item,index) in songList"
+              :key="index"
+              :class="index%2==0?'':'table-white'"
+            >{{getTime(item.dt)}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-
 <script>
+// 遗留问题那条细线没有画
 import moment from "moment";
 export default {
   data() {
     return {
       //up用来判断简介内容多行是，扩展图标朝向
       up: false,
+      songList: [],
+      input: "",
       desLines: 0,
+      commentNums: 0,
       detailInfo: {
         playlist: {
-          creator: {}
+          creator: {},
+          description: ""
         }
       }
     };
@@ -86,13 +152,22 @@ export default {
     const vm = this;
     fetch(`http://localhost:3000/playlist/detail?id=${id}`)
       .then(res => {
-        console.log(res);
         return Promise.resolve(res.json());
       })
       .then(function(res) {
         if (res.code === 200) {
           vm.detailInfo = res;
+          vm.songList = res.playlist.tracks;
           vm.checkLines(res.playlist.description);
+        }
+      });
+    fetch(`http://localhost:3000/comment/playlist?id=${id}`)
+      .then(res => {
+        return Promise.resolve(res.json());
+      })
+      .then(function(res) {
+        if (res.code === 200) {
+          vm.commentNums = res.total;
         }
       });
   },
@@ -114,8 +189,8 @@ export default {
         this.desLines++;
         str = str.replace(/(\r\n|\n|\r)/, "<br />");
         num++;
-        if(num>1){
-          this.up=true;
+        if (num > 1) {
+          this.up = true;
         }
       }
     },
@@ -126,21 +201,35 @@ export default {
     getReduceLines(str) {
       let first_str = str.replace(/(\r\n|\n|\r)/gm, "<br />");
       let str_arr = first_str.split("<br />");
+      return str_arr[0] + "<br />" + str_arr[1] + "...";
+    },
+    getIndex(index) {
+      return index < 9 ? `0${index + 1}` : index + 1;
+    },
+    getSongerName(arr) {
       let res = "";
-      for (let i = 0; i < 2; i++) {
-        res += str_arr[i] + "<br />";
+      for (let i = 0; i <= arr.length - 1; i++) {
+        i < arr.length - 1
+          ? (res += arr[i].name + " / ")
+          : (res += arr[i].name);
       }
       return res;
+    },
+    getTime(time) {
+      let time_to_s = parseInt(time / 1000);
+      let time_m = parseInt(time_to_s / 60); //分
+      let time_s = time_to_s % 60; //秒
+      return time_m < 10 ? `0${time_m}:${time_s}` : `${time_m}:${time_s}`;
     }
   }
 };
 </script>
 
-<style scoped lang="less">
+<style lang="less">
 .top {
   font-size: 13px;
-  margin: 20px 20px 50px 20px;
   display: flex;
+  margin: 20px 20px 50px 20px;
   > div {
     margin: 10px;
   }
@@ -233,7 +322,7 @@ export default {
         color: rgb(44, 122, 209);
       }
       :not(:last-child)::after {
-        content: "/";
+        content: " / ";
         color: white;
       }
     }
@@ -246,6 +335,102 @@ export default {
         top: 0;
         right: 0;
       }
+    }
+  }
+}
+.songList{
+  margin-bottom: 80px;
+}
+.songList-top {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 6px;
+  .song-list-title {
+    display: flex;
+    > a {
+      display: block;
+      margin: 0 20px;
+      cursor: pointer;
+      position: relative;
+      text-decoration: none;
+      color: rgb(173, 175, 178);
+    }
+    > a:target::before {
+      position: absolute;
+      width: 100%;
+      bottom: -6px;
+      left: 0;
+      height: 4px;
+      background: rgb(184, 37, 37);
+      content: "";
+    }
+  }
+  .songList-search {
+    display: flex;
+    align-items: center;
+    border-radius: 50px;
+    background: rgb(32, 34, 38);
+    padding: 0px 10px 0px 15px;
+    input {
+      padding: 0;
+      height: 24px;
+      line-height: 24px;
+      background: rgb(32, 34, 38);
+      outline: none;
+      border: 0;
+      outline: none;
+      color: white;
+    }
+  }
+}
+.songList-table {
+  .table-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    color: rgb(130, 131, 133);
+    font-size: 13px;
+    align-items: flex-start;
+    .table-title {
+      border-right: 1px solid rgb(130, 131, 133);
+      border-top: 1px solid rgb(130, 131, 133);
+      border-bottom: 1px solid rgb(130, 131, 133);
+    }
+    .table-title-last {
+      border-top: 1px solid rgb(130, 131, 133);
+      border-bottom: 1px solid rgb(130, 131, 133);
+    }
+    .table-white {
+      background: rgb(35, 34, 41);
+    }
+    > div > div {
+      padding: 4px 5px;
+      height: 20px;
+      line-height: 20px;
+    }
+    #index {
+      flex: 0 0 auto;
+      text-align: right;
+      #blackDiv {
+        height: 20px;
+        width: 40px;
+      }
+    }
+    #action {
+      flex: 0 0 auto;
+    }
+    #title {
+      flex: 3 1 auto;
+    }
+    #songer {
+      flex: 2 1 auto;
+    }
+    #album {
+      flex: 2 1 auto;
+    }
+    #time {
+      flex: 1 1 auto;
     }
   }
 }
