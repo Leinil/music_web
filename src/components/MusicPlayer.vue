@@ -1,5 +1,5 @@
 <template>
-  <div class="player-border">
+  <div id="music-player">
     <div class="left-buttons">
       <div class="previous"></div>
       <div class="play"></div>
@@ -26,7 +26,7 @@ export default {};
 </script>
 
 <style lang="less">
-.player-border {
+#music-player {
   font-size: 12px;
   color: white;
   display: flex;

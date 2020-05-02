@@ -1,6 +1,6 @@
 <template>
   <div class="song-sheet-border">
-    <div class="top">
+    <div id="top-brief">
       <div class="img-border">
         <img :src="detailInfo.playlist.coverImgUrl" />
       </div>
@@ -72,63 +72,26 @@
           <i class="el-icon-search serchIcon"></i>
         </div>
       </div>
-      <div class="songList-table">
-        <div class="table-item">
-          <div id="index">
-            <div class="table-title" id="blackDiv"></div>
-            <div
-              v-for="(item,index) in songList"
-              :key="index"
-              :class="index%2==0?'':'table-white'"
-            >{{getIndex(index)}}</div>
-          </div>
-          <div id="action">
-            <div class="table-title">操作</div>
-            <div v-for="(item,index) in songList" :key="index" :class="index%2==0?'':'table-white'">
-              <i class="el-icon-download"></i>
-            </div>
-          </div>
-          <div id="title">
-            <div class="table-title">音乐标题</div>
-            <div
-              v-for="(item,index) in songList"
-              :key="index"
-              :class="index%2==0?'':'table-white'"
-            >{{item.name}}</div>
-          </div>
-          <div id="songer">
-            <div class="table-title">歌手</div>
-            <div
-              v-for="(item,index) in songList"
-              :key="index"
-              :class="index%2==0?'':'table-white'"
-            >{{getSongerName(item.ar)}}</div>
-          </div>
-          <div id="album">
-            <div class="table-title">专辑</div>
-            <div
-              v-for="(item,index) in songList"
-              :key="index"
-              :class="index%2==0?'':'table-white'"
-            >{{item.al.name}}</div>
-          </div>
-          <div id="time">
-            <div class="table-title-last">时长</div>
-            <div
-              v-for="(item,index) in songList"
-              :key="index"
-              :class="index%2==0?'':'table-white'"
-            >{{getTime(item.dt)}}</div>
-          </div>
-        </div>
-      </div>
+
+      <SongList
+        :data="songList"
+        :column="column"
+        v-if="songList.length>0"
+        :outSideClientHeight="songListEffectClientHeight"
+        :outSideOffsetHeight="songListEffectOffsetHeight"
+        :relativeDom="songListRalativeDom"
+      />
     </div>
   </div>
 </template>
 <script>
 // 遗留问题那条细线没有画
 import moment from "moment";
+import SongList from "@/components/SongList.vue";
 export default {
+  components: {
+    SongList
+  },
   data() {
     return {
       //up用来判断简介内容多行是，扩展图标朝向
@@ -142,10 +105,82 @@ export default {
           creator: {},
           description: ""
         }
-      }
+      },
+      column: [
+        {
+          title: "序号",
+          key: "num",
+          col: 1,
+          hiddenText: true,
+          style: {
+            "text-align": "right",
+            "padding-right": "6px"
+          },
+          render: (record, index) => {
+            return this.getIndex(index);
+          }
+        },
+        {
+          title: "操作",
+          key: "action",
+          col: 1
+        },
+        {
+          title: "音乐标题",
+          key: "name",
+          dataIndex: "name",
+          col: 7
+        },
+        {
+          title: "歌手",
+          key: "ar",
+          dataIndex: "ar",
+          col: 6,
+          render: (record, index) => {
+            return this.getSongerName(record.ar);
+          }
+        },
+        {
+          title: "专辑",
+          key: "al",
+          dataIndex: "al",
+          col: 5,
+          render: record => {
+            return record.al.name;
+          },
+          sort: (pre, next) => {
+            return pre.al.name.length - next.al.name.length;
+          }
+        },
+        {
+          title: "时长",
+          dataIndex: "dt",
+          key: "dt",
+          col: 4,
+          render: record => {
+            return this.getTime(record.dt);
+          },
+          sort: (pre, next) => {
+            return pre.dt - next.dt;
+          }
+        }
+      ],
+      // 歌单展示组件中所需，一个为滑块的相对挂载dom，一个为影响可视区域的高德，一个为影响滑块加载判断的高度
+      songListRalativeDom: null,
+      songListEffectClientHeight: 0,
+      songListEffectOffsetHeight: 0
     };
   },
+
   mounted() {
+    this.songListRalativeDom = document.getElementById("content");
+    this.songListEffectClientHeight =
+      document.getElementById("topbar").clientHeight +
+      document.getElementById("music-player").clientHeight;
+    this.songListEffectOffsetHeight = document.getElementById(
+      "top-brief"
+    ).clientHeight;
+
     const {
       params: { id }
     } = this.$route;
@@ -170,6 +205,11 @@ export default {
           vm.commentNums = res.total;
         }
       });
+  },
+  updated() {
+    this.songListEffectOffsetHeight = document.getElementById(
+      "top-brief"
+    ).clientHeight;
   },
   methods: {
     getCreatTime(time) {
@@ -219,14 +259,25 @@ export default {
       let time_to_s = parseInt(time / 1000);
       let time_m = parseInt(time_to_s / 60); //分
       let time_s = time_to_s % 60; //秒
-      return time_m < 10 ? `0${time_m}:${time_s}` : `${time_m}:${time_s}`;
+      const tStr = time_m < 10 ? "0" : "1";
+      const sStr = time_s < 10 ? "0" : "1";
+      switch (tStr + sStr) {
+        case "11":
+          return `${time_m}:${time_s}`;
+        case "10":
+          return `${time_m}:0${time_s}`;
+        case "01":
+          return `0${time_m}:${time_s}`;
+        case "00":
+          return `0${time_m}:0${time_s}`;
+      }
     }
   }
 };
 </script>
 
 <style lang="less">
-.top {
+#top-brief {
   font-size: 13px;
   display: flex;
   margin: 20px 20px 50px 20px;
@@ -338,7 +389,7 @@ export default {
     }
   }
 }
-.songList{
+.songList {
   margin-bottom: 80px;
 }
 .songList-top {
