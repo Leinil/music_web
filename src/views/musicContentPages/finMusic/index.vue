@@ -12,7 +12,7 @@
       <div class="carousel">
         <el-carousel :interval="40000" type="card" height="185px">
           <el-carousel-item v-for="(item,index) in templateShow" :key="index">
-            <img :src="item.picUrl" class="img" />
+            <img :src="item.imageUrl" class="img" />
           </el-carousel-item>
         </el-carousel>
       </div>
@@ -24,7 +24,12 @@
         </span>
       </div>
       <div class="recommendSongs">
-        <div v-for="(item,index) in recommendSongs" :key="index" class="recommendBorder" @click="goToSongSheet(item.id)">
+        <div
+          v-for="(item,index) in recommendSongs"
+          :key="index"
+          class="recommendBorder"
+          @click="goToSongSheet(item.id)"
+        >
           <img :src="item.picUrl" />
           <span>{{item.name}}</span>
           <div class="hoverBorder">
@@ -49,6 +54,7 @@
 </template>
 <script>
 import { Loading } from "element-ui";
+import { baseUrl } from "@/utiles/ip";
 export default {
   name: "home",
   data() {
@@ -68,18 +74,18 @@ export default {
     });
     const vm = this;
     //轮播信息获取
-    fetch("http://localhost:3000/personalized/privatecontent")
+    fetch(`${baseUrl}/banner`)
       .then(res => {
         return Promise.resolve(res.json());
       })
       .then(function(res) {
         if (res.code === 200) {
-          vm.templateShow = res.result;
+          vm.templateShow = res.banners;
           loadingInstance.close();
         }
       });
     //推荐歌单获取
-    fetch("http://localhost:3000/personalized?limit=10")
+    fetch(`${baseUrl}/personalized?limit=10`)
       .then(res => {
         return Promise.resolve(res.json());
       })
@@ -89,8 +95,8 @@ export default {
         }
       });
     //推荐歌单获取2434388371
-    fetch("http://localhost:3000/song/detail?ids=441491828");
-    fetch("http://localhost:3000/playlist/detail?id=2434388371");
+    // fetch(`http://localhost:3000/song/detail?ids=441491828`);
+    // fetch(`http://localhost:3000/playlist/detail?id=2434388371`);
     //添加对于顶部tab的事件监听
     let itemsPart = document.getElementById("topTabs");
     const that = this;
@@ -120,8 +126,8 @@ export default {
       num / 100000 > 0 ? (str = `${(num / 10000).toFixed()}万`) : (str = num);
       return str;
     },
-    goToSongSheet(id){
-       this.$router.push(`/side/songSheet/${id}`)
+    goToSongSheet(id) {
+      this.$router.push(`/side/songSheet/${id}`);
     }
   },
   watch: {}

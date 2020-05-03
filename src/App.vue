@@ -17,6 +17,10 @@ export default {
 <style scope>
 html,
 body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   margin: 0;
   height: 100%;
   min-width: 1024px;

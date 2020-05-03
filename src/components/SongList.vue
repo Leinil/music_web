@@ -21,7 +21,12 @@
       </el-col>
     </el-row>
     <div id="preSongs"></div>
-    <el-row v-for="(song,index) in partData" :key="index" class="hover-color">
+    <el-row
+      v-for="(song,index) in partData"
+      :key="index"
+      class="hover-color"
+      @click.native="colClick&&_colClick(colClick,song)"
+    >
       <el-col
         v-for="item in column"
         :key="item.key"
@@ -87,6 +92,9 @@ export default {
     outSideOffsetHeight: {
       type: Number,
       default: 0
+    },
+    colClick: {
+      type: Function
     }
   },
 
@@ -136,6 +144,9 @@ export default {
   },
 
   methods: {
+    _colClick(func, record) {
+      func(record);
+    },
     // 单纯的排序
     getSort(func, current) {
       this.currentSort = current;

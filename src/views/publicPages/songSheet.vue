@@ -52,9 +52,11 @@
           <span v-for="(item,index) in detailInfo.playlist.tags" :key="index">{{item}}</span>
         </div>
         <div class="brief">
-          简介:
-          <span v-html="getReduceLines(detailInfo.playlist.description)" v-if="desLines>1&&up"></span>
-          <span v-html="getTotalLines(detailInfo.playlist.description)" v-if="!up"></span>
+          <div :style="'flex:1 0 auto'">
+            简介:
+            <span v-html="getReduceLines(detailInfo.playlist.description)" v-if="desLines>1&&up"></span>
+            <span v-html="getTotalLines(detailInfo.playlist.description)" v-if="!up"></span>
+          </div>
           <i class="el-icon-arrow-down icon_bref" v-if="desLines>1&&up" @click="changeUpState"></i>
           <i class="el-icon-arrow-up icon_bref" v-if="desLines>1&&!up" @click="changeUpState"></i>
         </div>
@@ -80,6 +82,7 @@
         :outSideClientHeight="songListEffectClientHeight"
         :outSideOffsetHeight="songListEffectOffsetHeight"
         :relativeDom="songListRalativeDom"
+        :colClick="getMusicUrl"
       />
     </div>
   </div>
@@ -88,6 +91,7 @@
 // 遗留问题那条细线没有画
 import moment from "moment";
 import SongList from "@/components/SongList.vue";
+import { baseUrl } from "@/utiles/ip";
 export default {
   components: {
     SongList
@@ -116,8 +120,8 @@ export default {
             "text-align": "right",
             "padding-right": "6px"
           },
-          render: (record, index,preExit) => {
-            return this.getIndex(index+preExit);
+          render: (record, index, preExit) => {
+            return this.getIndex(index + preExit);
           }
         },
         {
@@ -177,15 +181,14 @@ export default {
     this.songListEffectClientHeight =
       document.getElementById("topbar").clientHeight +
       document.getElementById("music-player").clientHeight;
-    this.songListEffectOffsetHeight = document.getElementById(
-      "top-brief"
-    ).clientHeight+30;
+    this.songListEffectOffsetHeight =
+      document.getElementById("top-brief").clientHeight + 30;
 
     const {
       params: { id }
     } = this.$route;
     const vm = this;
-    fetch(`http://localhost:3000/playlist/detail?id=${id}`)
+    fetch(`${baseUrl}/playlist/detail?id=${id}`)
       .then(res => {
         return Promise.resolve(res.json());
       })
@@ -196,7 +199,7 @@ export default {
           vm.checkLines(res.playlist.description);
         }
       });
-    fetch(`http://localhost:3000/comment/playlist?id=${id}`)
+    fetch(`${baseUrl}/comment/playlist?id=${id}`)
       .then(res => {
         return Promise.resolve(res.json());
       })
@@ -206,11 +209,12 @@ export default {
         }
       });
   },
+
   updated() {
-    this.songListEffectOffsetHeight = document.getElementById(
-      "top-brief"
-    ).clientHeight+30;
+    this.songListEffectOffsetHeight =
+      document.getElementById("top-brief").clientHeight + 30;
   },
+
   methods: {
     getCreatTime(time) {
       return moment(time).format("YYYY-MM-DD");
@@ -271,6 +275,20 @@ export default {
         case "00":
           return `0${time_m}:0${time_s}`;
       }
+    },
+    getMusicUrl(record) {
+      this.$store.commit({
+        type: "changeSourceLoading",
+        payload: true
+      });
+      this.$store.dispatch({
+        type: "getMusicUrl",
+        id: record.id
+      });
+      this.$store.dispatch({
+        type: "getMusicSource",
+        id: record.id
+      });
     }
   }
 };
@@ -380,11 +398,9 @@ export default {
     .brief {
       font-size: 12px;
       position: relative;
+      display: flex;
       .icon_bref {
         cursor: pointer;
-        position: absolute;
-        top: 0;
-        right: 0;
       }
     }
   }
