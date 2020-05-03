@@ -116,8 +116,8 @@ export default {
             "text-align": "right",
             "padding-right": "6px"
           },
-          render: (record, index) => {
-            return this.getIndex(index);
+          render: (record, index,preExit) => {
+            return this.getIndex(index+preExit);
           }
         },
         {
@@ -179,7 +179,7 @@ export default {
       document.getElementById("music-player").clientHeight;
     this.songListEffectOffsetHeight = document.getElementById(
       "top-brief"
-    ).clientHeight;
+    ).clientHeight+30;
 
     const {
       params: { id }
@@ -209,7 +209,7 @@ export default {
   updated() {
     this.songListEffectOffsetHeight = document.getElementById(
       "top-brief"
-    ).clientHeight;
+    ).clientHeight+30;
   },
   methods: {
     getCreatTime(time) {

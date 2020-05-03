@@ -1,5 +1,5 @@
 <template>
-  <div class="list-border">
+  <div class="list-border" id="list">
     <el-row>
       <el-col
         v-for="item in column"
@@ -20,6 +20,7 @@
         ></i>
       </el-col>
     </el-row>
+    <div id="preSongs"></div>
     <el-row v-for="(song,index) in partData" :key="index" class="hover-color">
       <el-col
         v-for="item in column"
@@ -28,7 +29,10 @@
         :class="index%2==0?'table-col':'table-col table-white-col'"
         :style="item.style?{...item.style}:''"
       >
-        <span :title="item.render(song,index)" v-if="item.render">{{item.render(song,index)}}</span>
+        <span
+          :title="item.render(song,index,preExit)"
+          v-if="item.render"
+        >{{item.render(song,index,preExit)}}</span>
         <span :title="song[item.dataIndex]" v-else>{{song[item.dataIndex]}}</span>
       </el-col>
     </el-row>
@@ -94,16 +98,15 @@ export default {
       // 当前以什么排序
       currentSort: "",
       // 由于我自己的网站的特殊性（比较死板），关于scroll的滑动控制将以#content为基准
-      contentDom: document.getElementById("content"),
+      contentDom: this.relativeDom,
       // lazyLoadloading: false,
-      oneColHeight: 0
+      oneColHeight: 0,
+      preExit: 0
     };
   },
   watch: {
     outSideOffsetHeight: function(newHeight, oldHeight) {
       this.outSideOffsetHeight = newHeight;
-      console.log(newHeight, "new");
-      console.log(oldHeight, "old");
     }
   },
   mounted() {
@@ -117,7 +120,11 @@ export default {
     } else {
       this.partData = this.data.slice(0, this.partNum);
     }
-    this.contentDom.addEventListener("scroll", this.handleScroll, true);
+    if (this.data.length > 150) {
+      this.contentDom.addEventListener("scroll", this.handleScrollLevel2, true);
+    } else {
+      this.contentDom.addEventListener("scroll", this.handleScroll, true);
+    }
     // 当数据加载之后，获取单个歌曲的高度
     this.oneColHeight = [
       ...document.getElementsByClassName("el-row")
@@ -146,12 +153,10 @@ export default {
     },
 
     handleScroll() {
+      // 获取的值不一定是精确的整数值
       const bottomOfContent =
-        this.contentDom.scrollHeight ===
+        this.contentDom.scrollHeight - 1 <
         this.contentDom.clientHeight + this.contentDom.scrollTop;
-      console.log(this.contentDom.scrollHeight);
-      console.log(this.contentDom.clientHeight);
-      console.log(this.contentDom.scrollTop);
       if (bottomOfContent) {
         if (this.partData.length < this.data.length) {
           this.partNum += this.partNum;
@@ -166,29 +171,73 @@ export default {
       }
     },
 
+    throttling() {
+      let action = true;
+      const that = this;
+      return function() {
+        if (!action) {
+          return;
+        }
+        action = false;
+        setTimeout(() => {
+          that.handleScrollLevel2();
+          action = true;
+        }, 800);
+      };
+    },
+
     // 类似无限滚动的下拉菜单
     handleScrollLevel2() {
       const windowClientHeight = document.documentElement.clientHeight;
       const scrollOffset = this.contentDom.scrollTop;
       // 当前屏幕可视区域可展示的总数
-      const currentScreenCanShowColNum =
-        (windowClientHeight - this.outSideClientHeight) / this.oneColHeight;
-      // 在滑块之前可能已经展示了的总数
-      let preShowNum =
-        (scrollOffset - this.outSideOffsetHeight) / this.oneColHeight;
-      // 10为自定义预估的上下额外渲染的dom，为了防止滑动过快
-      preShowNum > 10 ? (preShowNum = preShowNum - 10) : (preShowNum = 0);
-      console.log(preShowNum, "preShowNum");
-      console.log(currentScreenCanShowColNum, "currentScreenCanShowColNum");
-      this.partData = this.data.slice(
-        preShowNum,
-        currentScreenCanShowColNum + 10
+      const currentScreenCanShowColNum = parseInt(
+        (windowClientHeight - this.outSideClientHeight) / this.oneColHeight
       );
+
+      // 在滑块之前可能已经展示了的总数
+      let preShowNum = parseInt(
+        (scrollOffset - this.outSideOffsetHeight - 50) / this.oneColHeight
+      );
+      // 10为自定义预估的上下额外渲染的dom，为了防止滑动过快
+      preShowNum < 2 ? (preShowNum = 0) : preShowNum;
+      this.preExit = preShowNum;
+      // width设置为负数时会失效
+      if (preShowNum + currentScreenCanShowColNum < this.data.length) {
+        // width设置为负数时会失效
+        document.getElementById("list").style.height =
+          windowClientHeight + preShowNum * this.oneColHeight + "px";
+        document.getElementById("preSongs").style.height =
+          preShowNum * this.oneColHeight + "px";
+        document.getElementById("preSongs").style.marginTop = "0px";
+        this.partData = this.data.slice(
+          preShowNum,
+          preShowNum + currentScreenCanShowColNum + 2
+        );
+      } else {
+        document.getElementById("preSongs").style.marginTop =
+          this.outSideClientHeight + "px";
+        this.partData = this.data.slice(
+          this.data.length - currentScreenCanShowColNum,
+          this.data.length
+        );
+        this.preExit = parseInt(
+          document.getElementById("preSongs").clientHeight / this.oneColHeight
+        );
+      }
     }
   },
 
   beforeDestroy() {
-    this.contentDom.removeEventListener("scroll", this.handleScroll, true);
+    if (this.data.length > 150) {
+      this.contentDom.removeEventListener(
+        "scroll",
+        this.handleScrollLevel2,
+        true
+      );
+    } else {
+      this.contentDom.removeEventListener("scroll", this.handleScroll, true);
+    }
   },
 
   computed: {
