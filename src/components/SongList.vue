@@ -52,6 +52,7 @@
  * 由于该组件的展示相对于整个页面，在该组件的展示过程中，难免受到外部（上下两处的额外高度影响）所以加入了outSideHeightEffect的props参数
  */
 import { Loading } from "element-ui";
+import _ from "lodash";
 export default {
   props: {
     data: {
@@ -73,6 +74,7 @@ export default {
       default: true
     },
     lazyNum: {
+      // 用户自定义懒加载数据
       type: Number
     },
     relativeDom: {
@@ -95,13 +97,15 @@ export default {
       // 开启懒加载，每次加载50个数据
       partData: [],
       partNum: 50,
-      // 当前以什么排序
+      // 当前以什么字段排序
       currentSort: "",
-      // 由于我自己的网站的特殊性（比较死板），关于scroll的滑动控制将以#content为基准
+      // 一般情况下是基于body，但由于我自己的网站的特殊性需要设置相对滑动的dom
       contentDom: this.relativeDom,
       // lazyLoadloading: false,
       oneColHeight: 0,
-      preExit: 0
+      preExit: 0,
+      // 保存一份父组件数据
+      c_data: _.cloneDeep(this.data)
     };
   },
   watch: {
@@ -115,12 +119,12 @@ export default {
     // console.log(this.contentDom.scrollTop, "scrollTop,滑块距离最顶部的距离");
     // console.log(document.documentElement.clientHeight,"页面的可视高度");
     if (this.lazyNum) {
-      this.partData = this.data.slice(0, this.lazyNum);
+      this.partData = this.c_data.slice(0, this.lazyNum);
       this.partNum = this.lazyNum;
     } else {
-      this.partData = this.data.slice(0, this.partNum);
+      this.partData = this.c_data.slice(0, this.partNum);
     }
-    if (this.data.length > 150) {
+    if (this.c_data.length > 150) {
       this.contentDom.addEventListener("scroll", this.handleScrollLevel2, true);
     } else {
       this.contentDom.addEventListener("scroll", this.handleScroll, true);
@@ -132,20 +136,39 @@ export default {
   },
 
   methods: {
+    // 单纯的排序
     getSort(func, current) {
       this.currentSort = current;
       switch (this.sortStatus) {
         case "default":
           this.sortStatus = "down";
-          this.partData.sort(func);
+          this.c_data.sort(func);
           break;
         case "down":
           this.sortStatus = "up";
-          this.partData.reverse();
+          this.c_data.reverse();
           break;
         case "up":
           this.sortStatus = "default";
-          this.partData = this.data.slice(0, this.partNum);
+          this.c_data = _.cloneDeep(this.data);
+          break;
+        default:
+          break;
+      }
+      this.partData = this.c_data.slice(0, this.partNum);
+    },
+
+    // 重新渲染时的排序
+    getSortWhenRender(func) {
+      switch (this.sortStatus) {
+        case "down":
+          this.c_data.sort(func);
+          break;
+        case "up":
+          this.c_data.reverse();
+          break;
+        case "default":
+          this.c_data = this.data;
           break;
         default:
           break;
@@ -158,9 +181,9 @@ export default {
         this.contentDom.scrollHeight - 1 <
         this.contentDom.clientHeight + this.contentDom.scrollTop;
       if (bottomOfContent) {
-        if (this.partData.length < this.data.length) {
+        if (this.partData.length < this.c_data.length) {
           this.partNum += this.partNum;
-          this.partData = this.data.slice(0, this.partNum);
+          this.partData = this.c_data.slice(0, this.partNum);
         } else {
           this.contentDom.removeEventListener(
             "scroll",
@@ -171,23 +194,15 @@ export default {
       }
     },
 
-    throttling() {
-      let action = true;
-      const that = this;
-      return function() {
-        if (!action) {
-          return;
-        }
-        action = false;
-        setTimeout(() => {
-          that.handleScrollLevel2();
-          action = true;
-        }, 800);
-      };
-    },
-
     // 类似无限滚动的下拉菜单
     handleScrollLevel2() {
+      // for (let col = 0; col < this.column.length; col++) {
+      //   // 命中currentSort的话同时代表了有sort方法
+      //   if (this.column[col].key === this.currentSort) {
+      //     this.getSortWhenRender(this.column[col].sort);
+      //     break;
+      //   }
+      // }
       const windowClientHeight = document.documentElement.clientHeight;
       const scrollOffset = this.contentDom.scrollTop;
       // 当前屏幕可视区域可展示的总数
@@ -199,27 +214,25 @@ export default {
       let preShowNum = parseInt(
         (scrollOffset - this.outSideOffsetHeight - 50) / this.oneColHeight
       );
-      // 10为自定义预估的上下额外渲染的dom，为了防止滑动过快
       preShowNum < 2 ? (preShowNum = 0) : preShowNum;
       this.preExit = preShowNum;
-      // width设置为负数时会失效
-      if (preShowNum + currentScreenCanShowColNum < this.data.length) {
+      if (preShowNum + currentScreenCanShowColNum < this.c_data.length) {
         // width设置为负数时会失效
         document.getElementById("list").style.height =
           windowClientHeight + preShowNum * this.oneColHeight + "px";
         document.getElementById("preSongs").style.height =
           preShowNum * this.oneColHeight + "px";
         document.getElementById("preSongs").style.marginTop = "0px";
-        this.partData = this.data.slice(
+        this.partData = this.c_data.slice(
           preShowNum,
           preShowNum + currentScreenCanShowColNum + 2
         );
       } else {
         document.getElementById("preSongs").style.marginTop =
           this.outSideClientHeight + "px";
-        this.partData = this.data.slice(
-          this.data.length - currentScreenCanShowColNum,
-          this.data.length
+        this.partData = this.c_data.slice(
+          this.c_data.length - currentScreenCanShowColNum,
+          this.c_data.length
         );
         this.preExit = parseInt(
           document.getElementById("preSongs").clientHeight / this.oneColHeight
@@ -229,7 +242,7 @@ export default {
   },
 
   beforeDestroy() {
-    if (this.data.length > 150) {
+    if (this.c_data.length > 150) {
       this.contentDom.removeEventListener(
         "scroll",
         this.handleScrollLevel2,
