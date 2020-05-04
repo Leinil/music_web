@@ -82,6 +82,7 @@ export default {
     const redRoadVoice = document.getElementById("red-road-voice");
     whiteBall.addEventListener("mousedown", this.mouseDown, false);
     whiteBallVoice.addEventListener("mousedown", this.mouseDownVoice, false);
+    this.$refs.audio.onended = this.playNext;
     this.$refs.audio.volume = sessionStorage.getItem("voice")
       ? sessionStorage.getItem("voice")
       : 0.1;
@@ -139,10 +140,50 @@ export default {
   },
 
   methods: {
-    playPre() {
-      
+    playNext() {
+      const songsList = this.$store.state.idsList;
+      const index = songsList.indexOf(this.currentPlayDetail.id);
+      let nextId = "";
+      if (index === songsList.length - 1) {
+        nextId = songsList[0];
+      } else {
+        nextId = songsList[index + 1];
+      }
+      this.$store.commit({
+        type: "changeSourceLoading",
+        payload: true
+      });
+      this.$store.dispatch({
+        type: "getMusicUrl",
+        id: nextId
+      });
+      this.$store.dispatch({
+        type: "getMusicSource",
+        id: nextId
+      });
     },
-    playNext() {},
+    playPre() {
+      const songsList = this.$store.state.idsList;
+      const index = songsList.indexOf(this.currentPlayDetail.id);
+      let preId = "";
+      if (index === 0) {
+        preId = songsList[songsList.length - 1];
+      } else {
+        preId = songsList[index - 1];
+      }
+      this.$store.commit({
+        type: "changeSourceLoading",
+        payload: true
+      });
+      this.$store.dispatch({
+        type: "getMusicUrl",
+        id: preId
+      });
+      this.$store.dispatch({
+        type: "getMusicSource",
+        id: preId
+      });
+    },
     getSongerName(arr) {
       let res = "";
       for (let i = 0; i <= arr.length - 1; i++) {
