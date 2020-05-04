@@ -6,17 +6,17 @@
       <i class="el-icon-arrow-right addColorBorder"></i>
       <div id="serchInput">
         <div class="inputSpan">
-          <input type="text" class="input" placeholder="音乐/视频/电台/用户"/>
+          <input type="text" class="input" placeholder="音乐/视频/电台/用户" />
           <i class="el-icon-search serchIcon"></i>
         </div>
       </div>
     </div>
     <div class="right">
-      <div class="userLoginIn" style='margin-right:9px'>
+      <div class="userLoginIn" style="margin-right:9px">
         <i class="el-icon-user"></i>
       </div>
       <span style="font-size:8px">未登录</span>
-      <i class="el-icon-caret-bottom" style='margin:0px 9px'></i>
+      <i class="el-icon-caret-bottom" style="margin:0px 9px"></i>
       <span style="font-size:8px">开通VIP</span>
       <i class="el-icon-magic-stick icon"></i>
       <i class="el-icon-message icon"></i>
@@ -28,12 +28,12 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import HomePageContent from "@/components/HomePageContent.vue";
-import router from '../router';
+import router from "../router";
 
 @Component
 export default class HomePageTopbar extends Vue {
-  goBackToHome(){
-    router.push('/')
+  goBackToHome() {
+    router.push("/");
   }
 }
 </script>
@@ -105,12 +105,12 @@ export default class HomePageTopbar extends Vue {
     background-size: 100%;
     background-position: 10px -10px;
   }
-  .right{
+  .right {
     position: absolute;
     right: 18px;
     display: flex;
     align-items: center;
-    .userLoginIn{
+    .userLoginIn {
       width: 22px;
       height: 22px;
       border-radius: 50px;
@@ -119,9 +119,14 @@ export default class HomePageTopbar extends Vue {
       align-items: center;
       justify-content: center;
     }
-    .icon{
-      margin:0px 15px
+    .icon {
+      margin: 0px 15px;
     }
+  }
+}
+@media screen and (max-width: 780px) {
+  #topbar > .right {
+    display: none;
   }
 }
 </style>

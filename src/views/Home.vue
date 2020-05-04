@@ -5,7 +5,6 @@
         <HomePageTopbar />
       </div>
       <router-view></router-view>
-      <music-player></music-player>
     </div>
   </div>
 </template>
@@ -13,12 +12,10 @@
 <script>
 // @ is an alias to /src
 import HomePageTopbar from "@/views/HomePageTopbar.vue";
-import MusicPlayer from "@/components/MusicPlayer.vue";
 export default {
   name: "home",
   components: {
     HomePageTopbar,
-    'music-player':MusicPlayer,
   },
   data() {
     return {};

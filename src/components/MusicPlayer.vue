@@ -77,6 +77,7 @@ export default {
   },
 
   mounted() {
+    this.$refs.audio.pause();
     const whiteBall = document.getElementById("white-ball-col");
     const whiteBallVoice = document.getElementById("white-ball-voice");
     const redRoadVoice = document.getElementById("red-road-voice");
@@ -129,7 +130,7 @@ export default {
   },
 
   beforeUpdate() {
-    if (this.currentPlayUrl !== "") {
+    if (this.currentPlayUrl !== "" && this.playStatus) {
       if (this.totalTime - 1 < this.timeRuned) {
         clearInterval(this.timer);
         this.timeRuned = 0;
@@ -139,9 +140,21 @@ export default {
     }
   },
 
+  beforeDestroy() {
+    clearInterval(this.timer);
+    this.$store.commit({
+      type: "changeCurrentUrl",
+      payload: ""
+    });
+  },
+
   methods: {
     playNext() {
       const songsList = this.$store.state.idsList;
+      if (songsList.length === 0) {
+        this.totalTime = 0;
+        return;
+      }
       const index = songsList.indexOf(this.currentPlayDetail.id);
       let nextId = "";
       if (index === songsList.length - 1) {
@@ -164,6 +177,10 @@ export default {
     },
     playPre() {
       const songsList = this.$store.state.idsList;
+      if (songsList.length === 0) {
+        this.totalTime = 0;
+        return;
+      }
       const index = songsList.indexOf(this.currentPlayDetail.id);
       let preId = "";
       if (index === 0) {
@@ -308,7 +325,7 @@ export default {
     },
 
     play() {
-      if (!this.$refs.audio) {
+      if (!this.$refs.audio || this.currentPlayUrl === "") {
         return;
       }
       this.$refs.audio.play();

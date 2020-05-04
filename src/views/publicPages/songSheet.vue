@@ -7,9 +7,9 @@
       <div class="info-list">
         <div class="sheet-info">
           <div class="sheet-name">
-            <span>歌单</span>
-            <div>
-              <span>{{detailInfo.playlist.name}}</span>
+            <span style="flex: 1 0 auto">歌单</span>
+            <div class="sheet-title">
+              <span :title="detailInfo.playlist.name">{{detailInfo.playlist.name}}</span>
             </div>
           </div>
           <div class="num-info">
@@ -332,6 +332,11 @@ export default {
       .sheet-name {
         display: flex;
         align-items: center;
+        .sheet-title {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
         > span {
           font-size: 6px;
           color: rgb(201, 41, 41);
@@ -346,6 +351,7 @@ export default {
         display: flex;
         text-align: right;
         color: #828385;
+        flex: 0 0 auto;
         .line {
           background-color: #828385;
           width: 1px;

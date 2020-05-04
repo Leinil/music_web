@@ -37,7 +37,9 @@
               <i class="el-icon-headset"></i>
               {{getPlayCount(item.playCount)}}
             </div>
-            <div>{{item.copywriter}}</div>
+            <div>
+              <p class="reson">{{item.copywriter}}</p>
+            </div>
             <div class="playIcon"></div>
           </div>
         </div>
@@ -155,6 +157,14 @@ export default {
       width: 100%;
       height: 100%;
       overflow: hidden;
+      .reson {
+        margin: 0;
+        overflow: hidden; /*超出隐藏*/
+        text-overflow: ellipsis; /*文本溢出时显示省略标记*/
+        display: -webkit-box; /*设置弹性盒模型*/
+        -webkit-line-clamp: 2; /*文本占的行数,如果要设置2行加...则设置为2*/
+        -webkit-box-orient: vertical; /*子代元素垂直显示*/
+      }
       .playCount {
         font-size: 10px;
         position: absolute;
@@ -192,6 +202,9 @@ export default {
         box-sizing: border-box;
         background-color: rgba(32, 32, 32, 0.8);
         z-index: 99;
+        @media screen and (max-width: 1380px) {
+          padding: 0px 5px;
+        }
       }
       .playIcon {
         opacity: 0;
@@ -266,8 +279,17 @@ export default {
 }
 #init_content {
   min-height: 200px;
-  width: 60%;
   margin: 0 auto;
+}
+@media screen and(max-width: 1280px) {
+  #init_content {
+    width: 80%;
+  }
+}
+@media screen and(min-width: 1280px) {
+  #init_content {
+    width: 60%;
+  }
 }
 .carousel {
   padding-top: 10px;

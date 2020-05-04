@@ -3,7 +3,7 @@
     <div class="sideContentBlock">
       <div class="sideTitle">推荐</div>
       <div class="sideItems">
-        <router-link to="/side/findMusic" id="findMusic" class="checked">
+        <router-link to="/side/findMusic" id="findMusic">
           <i class="el-icon-headset"></i> 发现音乐
         </router-link>
         <router-link to="/side/selfFM" id="selfFM">

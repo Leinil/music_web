@@ -23,7 +23,7 @@ body {
   user-select: none;
   margin: 0;
   height: 100%;
-  min-width: 1024px;
+  min-width: 960px;
   overflow: hidden;
   background: rgb(25, 27, 31);
 }
