@@ -1,11 +1,11 @@
 <template>
   <div id="music-player">
     <div class="left-buttons">
-      <div class="previous"></div>
+      <div class="previous" @click="playPre"></div>
       <div class="wait" v-if="!loading&&pauseStatus" @click="play"></div>
       <div class="play" v-if="!loading&&currentPlayUrl!==''&&playStatus" @click="pause"></div>
       <div class="sourceLoading" v-if="loading"></div>
-      <div class="next"></div>
+      <div class="next" @click="playNext"></div>
     </div>
     <div class="time-sound">
       <div v-if="!currentPlayDetail">00:00</div>
@@ -19,14 +19,43 @@
       <div v-if="!currentPlayDetail">00:00</div>
       <div v-if="currentPlayDetail">{{getTime(totalTime)}}</div>
       <div class="sound-icon"></div>
-      <div class="sound-background"></div>
+      <!-- 为了简便音量显示为100px -->
+      <div class="sound-background">
+        <div id="red-road-voice"></div>
+        <div id="white-ball-voice">
+          <div id="red-ball-voice"></div>
+        </div>
+      </div>
     </div>
     <div class="songs-control">
       <div class="play-kind"></div>
       <div class="hz">极高</div>
-      <div class="song-list-icon"></div>
+      <el-popover placement="bottom" width="500" trigger="click" :offset="12">
+        <div class="song-border">
+          <p class="song-list-title">播放列表</p>
+          <el-row
+            v-for="(item,index) in musicSourceList"
+            :key="index"
+            :class="index%2==0?'song-list-item':'song-list-item table-white-col'"
+            type="flex"
+            justify="space-between"
+          >
+            <el-col :span="1" class="song-list-col">
+              <div v-if="item.id===currentPlayDetail.id" class="playing-icon"></div>
+            </el-col>
+            <el-col :span="12" class="song-list-col" :title="item.name">{{item.name}}</el-col>
+            <el-col
+              :span="5"
+              class="song-list-col"
+              :title="getSongerName(item.ar)"
+            >{{getSongerName(item.ar)}}</el-col>
+            <el-col :span="4" class="song-list-col time-show">{{getTimeBystring(item.dt)}}</el-col>
+          </el-row>
+        </div>
+        <div class="song-list-icon" slot="reference"></div>
+      </el-popover>
     </div>
-    <audio ref="audio" :src="currentPlayUrl" autoplay="autoplay" v-if="currentPlayUrl!==''"></audio>
+    <audio ref="audio" :src="currentPlayUrl" autoplay="autoplay"></audio>
   </div>
 </template>
 
@@ -41,14 +70,23 @@ export default {
       pauseStatus: true,
       playStatus: false,
       timeMovebegin: 0,
-      timeMoveDistance: 0,
+      voiceShowBegin: sessionStorage.getItem("voice") * 100 || 1,
+      voiceMovebegin: 0,
       currentWidth: 0
     };
   },
 
   mounted() {
     const whiteBall = document.getElementById("white-ball-col");
+    const whiteBallVoice = document.getElementById("white-ball-voice");
+    const redRoadVoice = document.getElementById("red-road-voice");
     whiteBall.addEventListener("mousedown", this.mouseDown, false);
+    whiteBallVoice.addEventListener("mousedown", this.mouseDownVoice, false);
+    this.$refs.audio.volume = sessionStorage.getItem("voice")
+      ? sessionStorage.getItem("voice")
+      : 0.1;
+    whiteBallVoice.style.left = this.voiceShowBegin + "px";
+    redRoadVoice.style.width = this.voiceShowBegin + "px";
   },
 
   computed: {
@@ -62,20 +100,13 @@ export default {
       return this.$store.state.currentPlayingMusicUrl;
     },
     currentPlayDetail: function() {
-      if (this.$store.state.sourceList.length) {
-        const detail = this.$store.state.sourceList[
-          this.$store.state.sourceList.length - 1
-        ];
-        return detail;
-      }
-      return null;
+      return this.$store.state.currentPlayingMusicDetail;
     }
   },
 
   watch: {
     currentPlayUrl: function(newUrl, oldUrl) {
       this.timeRuned = 0;
-      this.timeMoveDistance = 0;
       this.playStatus = true;
       this.pauseStatus = false;
     },
@@ -108,6 +139,36 @@ export default {
   },
 
   methods: {
+    playPre() {
+      
+    },
+    playNext() {},
+    getSongerName(arr) {
+      let res = "";
+      for (let i = 0; i <= arr.length - 1; i++) {
+        i < arr.length - 1
+          ? (res += arr[i].name + " / ")
+          : (res += arr[i].name);
+      }
+      return res;
+    },
+    getTimeBystring(time) {
+      let time_to_s = parseInt(time / 1000);
+      let time_m = parseInt(time_to_s / 60); //分
+      let time_s = time_to_s % 60; //秒
+      const tStr = time_m < 10 ? "0" : "1";
+      const sStr = time_s < 10 ? "0" : "1";
+      switch (tStr + sStr) {
+        case "11":
+          return `${time_m}:${time_s}`;
+        case "10":
+          return `${time_m}:0${time_s}`;
+        case "01":
+          return `0${time_m}:${time_s}`;
+        case "00":
+          return `0${time_m}:0${time_s}`;
+      }
+    },
     getEvent(event) {
       // 定义事件对象标准化函数
       if (!event) {
@@ -123,7 +184,12 @@ export default {
       // 计算鼠标指针的y轴距离
       return event; // 返回标准化的事件对象
     },
+
+    // 时间控制
     mouseDown(e) {
+      if (this.currentPlayUrl === "") {
+        return;
+      }
       let event = this.getEvent(e);
       this.timeMovebegin = event.mx;
       this.currentWidth = document.getElementById("red-road-col").clientWidth;
@@ -138,6 +204,11 @@ export default {
         this.currentWidth + event.mx - this.timeMovebegin > -1 &&
         this.currentWidth + event.mx - this.timeMovebegin < longest
       ) {
+        const musicTimeOff = parseInt(
+          ((this.currentWidth + event.mx - this.timeMovebegin) / longest) *
+            parseInt(this.$refs.audio.duration)
+        );
+        this.timeRuned = musicTimeOff;
         document.getElementById("red-road-col").style.width =
           this.currentWidth + event.mx - this.timeMovebegin + "px";
         document.getElementById("white-ball-col").style.left =
@@ -147,21 +218,54 @@ export default {
     mouseUp(e) {
       const event = this.getEvent(e);
       this.currentWidth = document.getElementById("red-road-col").clientWidth;
-      // if (this.timeMoveDistance + event.mx - this.timeMovebegin < -1) {
-      //   this.timeMoveDistance = 0;
-      // }
-      // if (this.timeMoveDistance + event.mx - this.timeMovebegin > longest) {
-      //   this.timeMoveDistance = longest;
-      // }
-      // if (
-      //   this.timeMoveDistance + event.mx - this.timeMovebegin >= 0 &&
-      //   this.timeMoveDistance + event.mx - this.timeMovebegin < longest
-      // ) {
-      //   this.timeMoveDistance += event.mx - this.timeMovebegin;
-      // }
+      const longest = document.getElementById("time-background").clientWidth;
+      const musicTimeOff =
+        (this.currentWidth / longest) * parseInt(this.$refs.audio.duration);
+      this.$refs.audio.currentTime = musicTimeOff;
+      this.timer = setInterval(() => {
+        this.timeRuned += 1;
+        const totalLong = document.getElementById("time-background")
+          .clientWidth;
+        document.getElementById("red-road-col").style.width =
+          (totalLong / this.totalTime) * this.timeRuned + "px";
+        document.getElementById("white-ball-col").style.left =
+          (totalLong / this.totalTime) * this.timeRuned + "px";
+      }, 1000);
       document.removeEventListener("mousemove", this.mouseMove, false);
       document.removeEventListener("mouseup", this.mouseUp, false);
     },
+    // 音量控制
+    mouseDownVoice(e) {
+      let event = this.getEvent(e);
+      this.voiceMovebegin = event.mx;
+      document.addEventListener("mousemove", this.mouseMoveVoice, false);
+      document.addEventListener("mouseup", this.mouseUpVoice, false);
+    },
+    mouseMoveVoice(e) {
+      let event = this.getEvent(e);
+      if (
+        this.voiceShowBegin + event.mx - this.voiceMovebegin > -1 &&
+        this.voiceShowBegin + event.mx - this.voiceMovebegin < 100
+      ) {
+        document.getElementById("red-road-voice").style.width =
+          this.voiceShowBegin + event.mx - this.voiceMovebegin + "px";
+        document.getElementById("white-ball-voice").style.left =
+          this.voiceShowBegin + event.mx - this.voiceMovebegin + "px";
+        this.$refs.audio.volume =
+          (this.voiceShowBegin + event.mx - this.voiceMovebegin) / 100;
+      }
+    },
+    mouseUpVoice(e) {
+      let event = this.getEvent(e);
+      this.voiceShowBegin += event.mx - this.voiceMovebegin;
+      document.removeEventListener("mousemove", this.mouseMoveVoice, false);
+      document.removeEventListener("mouseup", this.mouseUpVoice, false);
+      sessionStorage.setItem(
+        "voice",
+        document.getElementById("red-road-voice").clientWidth / 100
+      );
+    },
+
     play() {
       if (!this.$refs.audio) {
         return;
@@ -208,7 +312,71 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
+.playing-icon {
+  width: 100%;
+  height: 100%;
+  background-image: url("../../src/assets/pause.png");
+  background-position: 100% 100%;
+  background-repeat: no-repeat;
+}
+.table-white-col {
+  background: rgb(44, 46, 50);
+}
+.time-show {
+  padding-left: 35px;
+}
+.song-border {
+  max-height: 660px;
+  overflow: auto;
+}
+.time-right {
+  text-align: right;
+}
+.song-list-title {
+  color: white;
+  font-size: 10px;
+  text-align: center;
+}
+.song-list-col {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.song-list-item {
+  color: white;
+  font-size: 10px;
+  padding: 5px 0px;
+}
+#red-road-voice {
+  height: 4px;
+  width: 0px;
+  background: red;
+  border-radius: 5px;
+}
+#white-ball-voice {
+  cursor: pointer;
+  position: absolute;
+  top: -4px;
+  left: 0;
+  height: 12px;
+  width: 12px;
+  border-radius: 5px;
+  background: white;
+  #red-ball-voice {
+    height: 4px;
+    width: 4px;
+    background: red;
+    border-radius: 5px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    z-index: 9;
+  }
+}
 #red-road-col {
   height: 4px;
   width: 0px;

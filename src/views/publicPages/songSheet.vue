@@ -52,7 +52,7 @@
           <span v-for="(item,index) in detailInfo.playlist.tags" :key="index">{{item}}</span>
         </div>
         <div class="brief">
-          <div :style="'flex:1 0 auto'">
+          <div :style="'flex:1 1 auto'">
             简介:
             <span v-html="getReduceLines(detailInfo.playlist.description)" v-if="desLines>1&&up"></span>
             <span v-html="getTotalLines(detailInfo.playlist.description)" v-if="!up"></span>

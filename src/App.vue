@@ -14,7 +14,7 @@ export default {
 };
 </script>
 
-<style scope>
+<style>
 html,
 body {
   -webkit-user-select: none;
@@ -35,7 +35,11 @@ body {
   color: #2c3e50;
   height: 100%;
 }
-
+body /deep/.el-popper {
+  background: rgb(50, 52, 56);
+  border: 1px solid rgb(25, 27, 31);
+  padding: 12px 0px;
+}
 /* 控制滚动条样式 */
 ::-webkit-scrollbar {
   width: 10px;

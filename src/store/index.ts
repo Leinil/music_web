@@ -9,6 +9,9 @@ export default new Vuex.Store({
     sourceLoading: false,
     sourceList: [] as any[],
     currentPlayingMusicUrl: '',
+    currentPlayingMusicDetail: {},
+    // 判断是否已经添加过
+    idsList: [] as string[],
   },
   mutations: {
     changeSourceLoading(state, { payload }) {
@@ -17,8 +20,14 @@ export default new Vuex.Store({
     changeCurrentUrl(state, { payload }) {
       state.currentPlayingMusicUrl = payload;
     },
+    changeCurrentDetail(state, { payload }) {
+      state.currentPlayingMusicDetail = payload;
+    },
     changeSourceList(state, { payload }) {
-      state.sourceList.push(...payload);
+      state.sourceList.unshift(...payload);
+    },
+    changeIdsList(state, { payload }) {
+      state.idsList.unshift(payload);
     }
   },
   actions: {
@@ -43,7 +52,27 @@ export default new Vuex.Store({
         });
     },
 
-    getMusicSource({ commit }, { id }) {
+    getMusicSource({ commit, state }, { id }) {
+      if (state.idsList.indexOf(id) !== -1) {
+        fetch(`${baseUrl}/song/detail?ids=${id}`)
+          .then(res => {
+            return Promise.resolve(res.json());
+          })
+          .then(function (res) {
+            if (res.code === 200) {
+              const { songs } = res;
+              commit({
+                type: 'changeCurrentDetail',
+                payload: songs[0]
+              })
+            }
+          });
+        return
+      }
+      commit({
+        type: 'changeIdsList',
+        payload: id
+      })
       fetch(`${baseUrl}/song/detail?ids=${id}`)
         .then(res => {
           return Promise.resolve(res.json());
@@ -54,6 +83,10 @@ export default new Vuex.Store({
             commit({
               type: 'changeSourceList',
               payload: songs
+            })
+            commit({
+              type: 'changeCurrentDetail',
+              payload: songs[0]
             })
           }
         });
