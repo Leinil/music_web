@@ -33,7 +33,20 @@ import router from "../router";
 @Component
 export default class HomePageTopbar extends Vue {
   goBackToHome() {
-    router.push("/");
+    // 判断是不是开启了歌曲详情显示
+    const musicDetailOpen = document.getElementById("big-size");
+    if (musicDetailOpen) {
+      musicDetailOpen.style.width = "0px";
+      musicDetailOpen.style.height = "0px";
+      musicDetailOpen.style.transition = "all 0.4s";
+      musicDetailOpen.style.transitionDelay = "0.2s";
+    }
+    if (this.$route.path === "/index") {
+      return;
+    }
+    router.push({
+      name: "findMusicPage"
+    });
   }
 }
 </script>

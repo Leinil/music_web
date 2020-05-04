@@ -20,6 +20,7 @@ const routes = [
     children: [
       {
         path: 'index',
+        name:'findMusicPage',
         component: FindMusicIndex
       },
       {

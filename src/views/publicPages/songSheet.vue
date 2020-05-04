@@ -281,10 +281,12 @@ export default {
         type: "changeSourceLoading",
         payload: true
       });
+      // 获取播放的url资源
       this.$store.dispatch({
         type: "getMusicUrl",
         id: record.id
       });
+      // 获取歌曲详情
       this.$store.dispatch({
         type: "getMusicSource",
         id: record.id

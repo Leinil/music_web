@@ -13,7 +13,7 @@
 <script>
 // @ is an alias to /src
 import HomaPageSidebar from "@/views/HomePageSidebar.vue";
-import MusicPlayer from "@/components/MusicPlayer.vue";
+import MusicPlayer from "@/views/publicPages/musicPlayer.vue";
 export default {
   name: "home",
   components: {

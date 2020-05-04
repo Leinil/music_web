@@ -201,7 +201,6 @@ export default {
         transition-timing-function: cubic-bezier(0, 0, 1, 1);
         box-sizing: border-box;
         background-color: rgba(32, 32, 32, 0.8);
-        z-index: 99;
         @media screen and (max-width: 1380px) {
           padding: 0px 5px;
         }
