@@ -1,6 +1,5 @@
 <template>
   <div id="contentContainer">
-    asdfajsdfasjdf
     <HelloWorld />
   </div>
 </template>

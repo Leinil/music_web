@@ -64,7 +64,11 @@
           <div class="songComments">
             <p>听友评论</p>
             <div v-for="item in songComment" :key="item.user.userId" class="comment">
-              <img :src="item.user.avatarUrl" />
+              <img
+                src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
+                :data-src="item.user.avatarUrl"
+                class="userAvatar"
+              />
               <div class="comment-right">
                 <span class="comment-what">
                   <span>{{item.user.nickname}}:</span>
@@ -115,7 +119,6 @@ export default {
       required: true
     }
   },
-
   data() {
     return {
       // 初始化高度用来设置图片展示的大小
@@ -132,6 +135,15 @@ export default {
       this.initHeight -
       15 +
       "px";
+
+    document
+      .getElementById("big-size")
+      .addEventListener("scroll", this.handleScrol, true);
+  },
+  beforeDestroy() {
+    document
+      .getElementById("big-size")
+      .removeEventListener("scroll", this.handleScrol, true);
   },
   computed: {
     detail: function() {
@@ -152,6 +164,19 @@ export default {
     }
   },
   methods: {
+    handleScrol() {
+      const clenit = document.getElementById("big-size").clientHeight;
+      const offSet = document.getElementById("big-size").scrollTop;
+      const top = [...document.getElementsByClassName("top")][0].clientHeight;
+      // 66是听友品论的高度
+      const canShowNumber = parseInt((clenit + offSet - top - 66) / 50);
+      const imgList = document.getElementsByClassName("userAvatar");
+      for (let i = 0; i < imgList.length; i++) {
+        if (i < canShowNumber) {
+          imgList[i].src = imgList[i].dataset.src;
+        }
+      }
+    },
     getSongerName(arr) {
       let res = "";
       for (let i = 0; i <= arr.length - 1; i++) {
@@ -170,6 +195,9 @@ export default {
       setTimeout(() => {
         document.getElementById("big-size").style.transition = "all 0s";
       }, 600);
+      setTimeout(() => {
+        this.handleScrol();
+      }, 1000);
       this.allSettled(this.detail.id);
       this.$store.commit({
         type: "changeBigScreenStatus",
@@ -246,7 +274,6 @@ export default {
         .then(function(res) {
           if (res.code === 200) {
             const { hotComments } = res;
-            console.log(res, "评论");
             vm.songComment = hotComments;
           }
         });
@@ -259,7 +286,6 @@ export default {
         })
         .then(function(res) {
           if (res.code === 200) {
-            console.log(res, "歌");
             const { songs } = res;
             vm.simiSongs = songs;
           }
@@ -366,7 +392,7 @@ export default {
         height: 50vh;
         display: flex;
         justify-content: space-between;
-        margin: 50px 20px;
+        padding: 50px 20px;
         position: relative;
       }
       .top-filter {
