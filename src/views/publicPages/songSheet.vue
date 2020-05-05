@@ -276,6 +276,13 @@ export default {
           return `0${time_m}:0${time_s}`;
       }
     },
+    noUrl() {
+      this.$notify({
+        title: "资源获取失败",
+        message: "因版权或VIP问题无法获取资源~~",
+        type: "warning"
+      });
+    },
     getMusicUrl(record) {
       this.$store.commit({
         type: "changeSourceLoading",
@@ -284,12 +291,8 @@ export default {
       // 获取播放的url资源
       this.$store.dispatch({
         type: "getMusicUrl",
-        id: record.id
-      });
-      // 获取歌曲详情
-      this.$store.dispatch({
-        type: "getMusicSource",
-        id: record.id
+        id: record.id,
+        noUrlCallback: this.noUrl
       });
     }
   }

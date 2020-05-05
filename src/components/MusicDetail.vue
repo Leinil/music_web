@@ -273,12 +273,15 @@ export default {
       // 获取播放的url资源
       this.$store.dispatch({
         type: "getMusicUrl",
-        id
+        id,
+        noUrlCallback: this.noUrl
       });
-      // 获取歌曲详情
-      this.$store.dispatch({
-        type: "getMusicSource",
-        id
+    },
+    noUrl() {
+      this.$notify({
+        title: "资源获取失败",
+        message: "因版权或VIP问题无法获取资源~~",
+        type: "warning"
       });
     },
     getTime(time) {

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { baseUrl } from "@/utiles/ip";
+const baseUrl = 'http://47.101.145.34:3000';
 
 Vue.use(Vuex)
 
@@ -44,7 +44,7 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    getMusicUrl({ commit, state }, { id }) {
+    getMusicUrl({ commit, state, dispatch }, { id, noUrlCallback }) {
       const { preIds: { getUrl } } = state;
       // 判断前后两次是否查询同一个资源
       if (id === getUrl) {
@@ -70,10 +70,19 @@ export default new Vuex.Store({
           if (res.code === 200) {
             const { data } = res;
             const { url = '' } = data[0];
-            commit({
-              type: 'changeCurrentUrl',
-              payload: url
-            })
+            if (url) {
+              dispatch({
+                type: 'getMusicSource',
+                id,
+              })
+              commit({
+                type: 'changeCurrentUrl',
+                payload: url
+              })
+            } else {
+              // 执行一次异常返回
+              noUrlCallback();
+            }
             commit({
               type: 'changeSourceLoading',
               payload: false
@@ -84,24 +93,6 @@ export default new Vuex.Store({
 
     // 单个情况
     getMusicSource({ commit, state }, { id }) {
-      // 判断前后两次是否查询同一个资源
-      const { preIds: { getOneSource } } = state;
-      if (id === getOneSource) {
-        commit({
-          type: 'changeSourceLoading',
-          payload: false
-        })
-        return
-      }
-      // 记录查询的资源id
-      commit({
-        type: 'changeId',
-        payload: {
-          type: 'getOneSource',
-          num: id
-        }
-      })
-
       // 判断是否已经添加过了（歌单列表中使用，其实可以不用的。。。）
       if (state.idsList.indexOf(id) !== -1) {
         fetch(`${baseUrl}/song/detail?ids=${id}`)

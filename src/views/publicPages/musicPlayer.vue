@@ -115,11 +115,23 @@ export default {
 
   watch: {
     currentPlayUrl: function(newUrl, oldUrl) {
+      if (!this.$store.state.currentPlayingMusicUrl) {
+        const { name } = this.currentPlayDetail;
+        this.$notify({
+          title: `《${name}》资源获取失败`,
+          message: `因版权或当前权限问题无法播放`,
+          type: "warning"
+        });
+        this.pause();
+      }
       this.timeRuned = 0;
       this.playStatus = true;
       this.pauseStatus = false;
     },
     currentPlayDetail: function(newObj, oldObj) {
+      if (!this.currentPlayUrl) {
+        return;
+      }
       this.totalTime = parseInt(newObj.dt / 1000);
       if (this.timer) {
         clearInterval(this.timer);
@@ -175,11 +187,15 @@ export default {
       });
       this.$store.dispatch({
         type: "getMusicUrl",
-        id: nextId
+        id: nextId,
+        noUrlCallback: this.noUrl
       });
-      this.$store.dispatch({
-        type: "getMusicSource",
-        id: nextId
+    },
+    noUrl() {
+      this.$notify({
+        title: "资源获取失败",
+        message: "因版权或VIP问题无法获取资源~~",
+        type: "warning"
       });
     },
     playPre() {
@@ -201,11 +217,8 @@ export default {
       });
       this.$store.dispatch({
         type: "getMusicUrl",
-        id: preId
-      });
-      this.$store.dispatch({
-        type: "getMusicSource",
-        id: preId
+        id: preId,
+        noUrlCallback: this.noUrl
       });
     },
     getSongerName(arr) {
