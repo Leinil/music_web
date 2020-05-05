@@ -33,13 +33,17 @@ import router from "../router";
 @Component
 export default class HomePageTopbar extends Vue {
   goBackToHome() {
-    // 判断是不是开启了歌曲详情显示
+    // 判断是不是开启了歌曲详情显示(大屏)
     const musicDetailOpen = document.getElementById("big-size");
     if (musicDetailOpen) {
       musicDetailOpen.style.width = "0px";
       musicDetailOpen.style.height = "0px";
       musicDetailOpen.style.transition = "all 0.4s";
       musicDetailOpen.style.transitionDelay = "0.2s";
+      this.$store.commit({
+        type: "changeBigScreenStatus",
+        payload: false
+      });
     }
     if (this.$route.path === "/index") {
       return;

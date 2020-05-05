@@ -12,6 +12,12 @@ export default new Vuex.Store({
     currentPlayingMusicDetail: {},
     // 判断是否已经添加过
     idsList: [] as string[],
+    // 用这个id来判断是否与前一次发送的请求一致（url获取，歌单详情的获取）
+    preIds: {
+      getUrl: 0,
+      getOneSource: 0
+    } as { [key: string]: any },
+    isMusicPlayInBigScreen: false,
   },
   mutations: {
     changeSourceLoading(state, { payload }) {
@@ -28,10 +34,34 @@ export default new Vuex.Store({
     },
     changeIdsList(state, { payload }) {
       state.idsList.unshift(payload);
-    }
+    },
+    changeBigScreenStatus(state, { payload }) {
+      state.isMusicPlayInBigScreen = payload;
+    },
+    changeId(state, { payload }) {
+      const { type, num } = payload;
+      state.preIds[type] = num;
+    },
   },
   actions: {
-    getMusicUrl({ commit }, { id }) {
+    getMusicUrl({ commit, state }, { id }) {
+      const { preIds: { getUrl } } = state;
+      // 判断前后两次是否查询同一个资源
+      if (id === getUrl) {
+        commit({
+          type: 'changeSourceLoading',
+          payload: false
+        })
+        return
+      }
+      // 记录查询的资源id
+      commit({
+        type: 'changeId',
+        payload: {
+          type: 'getUrl',
+          num: id
+        }
+      })
       fetch(`${baseUrl}/song/url?id=${id}`)
         .then(res => {
           return Promise.resolve(res.json());
@@ -52,7 +82,27 @@ export default new Vuex.Store({
         });
     },
 
+    // 单个情况
     getMusicSource({ commit, state }, { id }) {
+      // 判断前后两次是否查询同一个资源
+      const { preIds: { getOneSource } } = state;
+      if (id === getOneSource) {
+        commit({
+          type: 'changeSourceLoading',
+          payload: false
+        })
+        return
+      }
+      // 记录查询的资源id
+      commit({
+        type: 'changeId',
+        payload: {
+          type: 'getOneSource',
+          num: id
+        }
+      })
+
+      // 判断是否已经添加过了（歌单列表中使用，其实可以不用的。。。）
       if (state.idsList.indexOf(id) !== -1) {
         fetch(`${baseUrl}/song/detail?ids=${id}`)
           .then(res => {

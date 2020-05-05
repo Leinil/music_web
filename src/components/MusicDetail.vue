@@ -14,10 +14,10 @@
       />
     </div>
     <div id="big-size">
-      <div class="go-small-icon">
-        <img src="../../src/assets/shrink.png" :width="40" :height="35" />
-      </div>
       <div class="big-screen-border">
+        <div class="go-small-icon">
+          <img src="../../src/assets/shrink.png" :width="40" :height="35" @click="goSmall" />
+        </div>
         <div class="top">
           <div class="top-filter"></div>
           <div class="top-left">
@@ -42,6 +42,21 @@
             </div>
           </div>
           <div class="top-right">
+            <p class="right-title">{{detail.name}}</p>
+            <div class="right-music-info">
+              <p>
+                专辑：
+                <span :title="detail.al.name">{{detail.al.name}}</span>
+              </p>
+              <p>
+                歌手：
+                <span :title="getSongerName(detail.ar)">{{getSongerName(detail.ar)}}</span>
+              </p>
+              <p>
+                来源：
+                <span>每日歌曲推荐</span>
+              </p>
+            </div>
             <span v-html="checkLines(lyric)"></span>
           </div>
         </div>
@@ -57,6 +72,8 @@ import _ from "lodash";
 export default {
   props: {
     musicDetail: {
+      // 通过是否处于大屏状态控制 请求发送优化,但是因为网易云的那个图标也可以关闭大屏状态，所以移动到stroe中
+      // bigScreenStatus: false,
       type: Object,
       required: true
     }
@@ -67,6 +84,8 @@ export default {
       // 初始化高度用来设置图片展示的大小
       initHeight: 0,
       lyric: "",
+      simiSongs: [],
+      songComment: []
     };
   },
   mounted() {
@@ -77,15 +96,22 @@ export default {
       15 +
       "px";
   },
-  beforeUpdate() {
-    document.getElementsByClassName(
-      "top-filter"
-    )[0].style.backgroundImage = `url(${this.musicDetail.al.picUrl})`;
-    this.getMusicLyric(this.musicDetail.id);
-  },
   computed: {
     detail: function() {
       return this.musicDetail;
+    },
+    id: function() {
+      return this.musicDetail.id;
+    }
+  },
+  watch: {
+    id: function() {
+      document.getElementsByClassName(
+        "top-filter"
+      )[0].style.backgroundImage = `url(${this.musicDetail.al.picUrl})`;
+      if (this.$store.state.isMusicPlayInBigScreen) {
+        this.allSettled(this.musicDetail.id);
+      }
     }
   },
   methods: {
@@ -107,7 +133,22 @@ export default {
       setTimeout(() => {
         document.getElementById("big-size").style.transition = "all 0s";
       }, 600);
-      this.getMusicLyric(this.detail.id);
+      this.allSettled(this.detail.id);
+      this.$store.commit({
+        type: "changeBigScreenStatus",
+        payload: true
+      });
+    },
+    goSmall() {
+      const bigScreen = document.getElementById("big-size");
+      bigScreen.style.width = "0px";
+      bigScreen.style.height = "0px";
+      bigScreen.style.transition = "all 0.4s";
+      bigScreen.style.transitionDelay = "0.2s";
+      this.$store.commit({
+        type: "changeBigScreenStatus",
+        payload: false
+      });
     },
     // 歌词换行
     checkLines(str) {
@@ -118,10 +159,20 @@ export default {
       });
       return useP;
     },
-    getMusicLyric(id) {
+    // 合成一下请求，等这些请求都结束之后才撤销loading状态
+    allSettled(id) {
       let loadingInstance = Loading.service({
         background: "rgb(25, 27, 31)"
       });
+      Promise.allSettled([
+        this.getSimiSongs(id),
+        this.getMusicComment(id),
+        this.getMusicLyric(id)
+      ]).then(() => {
+        loadingInstance.close();
+      });
+    },
+    getMusicLyric(id) {
       const vm = this;
       fetch(`${baseUrl}/lyric?id=${id}`)
         .then(res => {
@@ -129,11 +180,38 @@ export default {
         })
         .then(function(res) {
           if (res.code === 200) {
-            loadingInstance.close();
             const {
               lrc: { lyric }
             } = res;
             vm.lyric = lyric;
+          }
+        });
+    },
+    getMusicComment(id) {
+      const vm = this;
+      fetch(`${baseUrl}/comment/music?id=${id}`)
+        .then(res => {
+          return Promise.resolve(res.json());
+        })
+        .then(function(res) {
+          if (res.code === 200) {
+            const { hotComments } = res;
+            console.log(res, "评论");
+            vm.songComment = hotComments;
+          }
+        });
+    },
+    getSimiSongs(id) {
+      const vm = this;
+      fetch(`${baseUrl}/simi/song?id=${id}`)
+        .then(res => {
+          return Promise.resolve(res.json());
+        })
+        .then(function(res) {
+          if (res.code === 200) {
+            console.log(res, "歌");
+            const { songs } = res;
+            vm.simiSongs = songs;
           }
         });
     }
@@ -144,8 +222,7 @@ export default {
 <style lang="less" scoped>
 .music-detail {
   background: rgb(25, 27, 31);
-  color: white;
-  font-size: 13px;
+  color: rgb(179, 174, 174);
   width: 100%;
   .small-size {
     padding: 5px;
@@ -193,12 +270,23 @@ export default {
     bottom: 50px;
     left: 0;
     .big-screen-border {
-      width: 60%;
+      min-width: 960px;
+      width: 50%;
       margin: 0 auto;
       box-sizing: border-box;
       padding: 0px 36px;
+      position: relative;
       @media screen and (max-width: 1380px) {
         width: 80%;
+      }
+      .go-small-icon {
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        right: 0;
+        @media screen and (max-width: 1380px) {
+          // right: 10%;
+        }
       }
       .top {
         height: 50vh;
@@ -208,9 +296,11 @@ export default {
         position: relative;
       }
       .top-filter {
-        width: 50%;
-        height: 50%;
-        filter: blur(80px);
+        z-index: -1;
+        width: 100vw;
+        opacity: 0.3;
+        height: 50vh;
+        filter: blur(100px);
         background-repeat: no-repeat;
         background-size: 100% 100%;
         position: absolute;
@@ -219,6 +309,9 @@ export default {
         transform: translate(-50%, -50%);
       }
       .top-left {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         .single-cover {
           border-radius: 50%;
           animation: rotate 20s linear infinite;
@@ -241,7 +334,6 @@ export default {
         .left-icon-list {
           display: flex;
           justify-content: space-between;
-          margin: 45px 0px;
           div {
             padding: 5px 10px;
             background: rgb(47, 51, 54);
@@ -253,17 +345,29 @@ export default {
         }
       }
       .top-right {
-        flex: 1 0 auto;
+        width: 50%;
         height: 100%;
         overflow: auto;
-      }
-    }
-    .go-small-icon {
-      position: fixed;
-      top: 10%;
-      right: 20%;
-      @media screen and (max-width: 1380px) {
-        right: 10%;
+        span {
+          color: rgb(144, 148, 148);
+        }
+        .right-title {
+          color: white;
+          font-size: 22px;
+        }
+        .right-music-info {
+          display: flex;
+          justify-content: space-around;
+          p {
+            width: 30%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          span {
+            color: #409eff;
+          }
+        }
       }
     }
   }
