@@ -91,6 +91,7 @@
 // 遗留问题那条细线没有画
 import moment from "moment";
 import SongList from "@/components/SongList.vue";
+import { Loading } from "element-ui";
 import { baseUrl } from "@/utiles/ip";
 export default {
   components: {
@@ -187,6 +188,10 @@ export default {
     const {
       params: { id }
     } = this.$route;
+    let loadingInstance = Loading.service({
+      target: ".song-sheet-border",
+      background: "rgba(25, 27, 31, 1)"
+    });
     const vm = this;
     fetch(`${baseUrl}/playlist/detail?id=${id}`)
       .then(res => {
@@ -197,6 +202,7 @@ export default {
           vm.detailInfo = res;
           vm.songList = res.playlist.tracks;
           vm.checkLines(res.playlist.description);
+          loadingInstance.close();
         }
       });
     fetch(`${baseUrl}/comment/playlist?id=${id}`)

@@ -52,7 +52,7 @@ export default {
   #content {
     padding-top: 50px;
     overflow: auto;
-    padding-left: 200px;
+    padding-left: 201px;
     width: calc(100vw - 200px);
     height: calc(100vh - 100px);
   }

@@ -122,10 +122,6 @@ export default {
     }
   },
   mounted() {
-    // console.log(this.contentDom.scrollHeight, "scrollHeight,全部");
-    // console.log(this.contentDom.clientHeight, "clientHeight,元素本身");
-    // console.log(this.contentDom.scrollTop, "scrollTop,滑块距离最顶部的距离");
-    // console.log(document.documentElement.clientHeight,"页面的可视高度");
     if (this.lazyNum) {
       this.partData = this.c_data.slice(0, this.lazyNum);
       this.partNum = this.lazyNum;

@@ -63,7 +63,7 @@
         <div class="bottom">
           <div class="songComments">
             <p>听友评论</p>
-            <div v-for="item in songComment" :key="item.user.userId" class="comment">
+            <div v-for="item in songComment" :key="item.time" class="comment">
               <img
                 src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
                 :data-src="item.user.avatarUrl"
@@ -241,6 +241,7 @@ export default {
       let loadingInstance = Loading.service({
         background: "rgb(25, 27, 31)"
       });
+      let vm = this;
       Promise.allSettled([
         this.getSimiSongs(id),
         this.getMusicComment(id),
@@ -248,6 +249,9 @@ export default {
         this.getMusicUrl(id)
       ]).then(() => {
         loadingInstance.close();
+        setTimeout(() => {
+          vm.handleScrol();
+        }, 1000);
       });
     },
     getMusicLyric(id) {
