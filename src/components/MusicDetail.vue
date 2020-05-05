@@ -60,6 +60,24 @@
             <span v-html="checkLines(lyric)"></span>
           </div>
         </div>
+        <div class="bottom">
+          <div class="songComments">
+            <div v-for="item in songComment" :key="item.user.userId" class="comment">
+              <img :src="item.user.avatarUrl" />
+              <div class="comment-right">
+                <span class="comment-what">
+                  <span>{{item.user.nickname}}:</span>
+                  <span>{{item.content}}</span>
+                </span>
+                <div class="comment-time">
+                  <span>{{getTime(item.time)}}</span>
+                  <span><i class="el-icon-thumb"></i>{{item.likedCount}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="simiSongs"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -68,6 +86,7 @@
 <script>
 import { Loading } from "element-ui";
 import { baseUrl } from "@/utiles/ip";
+import moment from "moment";
 import _ from "lodash";
 export default {
   props: {
@@ -214,6 +233,9 @@ export default {
             vm.simiSongs = songs;
           }
         });
+    },
+    getTime(time) {
+      return moment(time).format("YYYY年M月D日 hh:ss");
     }
   }
 };
@@ -260,6 +282,8 @@ export default {
   #big-size {
     // z-index: 99;
     // display: none;
+    overflow-x: hidden;
+    // overflow: auto;
     background: rgb(22, 24, 28);
     transition: all 0.4s;
     transition-delay: 0.2s;
@@ -366,6 +390,45 @@ export default {
           }
           span {
             color: #409eff;
+          }
+        }
+      }
+      .bottom {
+        display: flex;
+        justify-content: space-between;
+        .songComments {
+          width: 70%;
+          .comment {
+            display: flex;
+            padding: 15px 0px;
+            border-top: 1px solid #fcfcfc38;
+            margin-bottom: -1px;
+            img {
+              min-width: 50px;
+              width: 50px;
+              height: 50px;
+              border-radius: 50%;
+              margin-right: 10px;
+            }
+            .comment-right {
+              width: 100%;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-around;
+              .comment-what {
+                text-align: left;
+                span:first-of-type {
+                  color: #409eff;
+                }
+              }
+              .comment-time {
+                display: flex;
+                justify-content: space-between;
+                i{
+                  margin-right: 5px;
+                }
+              }
+            }
           }
         }
       }
