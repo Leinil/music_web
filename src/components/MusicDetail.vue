@@ -62,6 +62,7 @@
         </div>
         <div class="bottom">
           <div class="songComments">
+            <p>听友评论</p>
             <div v-for="item in songComment" :key="item.user.userId" class="comment">
               <img :src="item.user.avatarUrl" />
               <div class="comment-right">
@@ -71,12 +72,29 @@
                 </span>
                 <div class="comment-time">
                   <span>{{getTime(item.time)}}</span>
-                  <span><i class="el-icon-thumb"></i>{{item.likedCount}}</span>
+                  <span>
+                    <i class="el-icon-thumb"></i>
+                    {{item.likedCount}}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-          <div class="simiSongs"></div>
+          <div class="simiSongs">
+            <p>相似歌曲</p>
+            <div
+              v-for="item in simiSongs"
+              :key="item.id"
+              class="simiSongCol"
+              @click="simiSongsClick(item.id)"
+            >
+              <img :src="item.album.picUrl" />
+              <div class="simiSongsInfo">
+                <div :title="item.name">{{item.name}}</div>
+                <div :title="getSongerName(item.artists)">{{getSongerName(item.artists)}}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -191,6 +209,19 @@ export default {
         loadingInstance.close();
       });
     },
+    simiSongsClick(id) {
+      let loadingInstance = Loading.service({
+        background: "rgb(25, 27, 31)"
+      });
+      Promise.allSettled([
+        this.getSimiSongs(id),
+        this.getMusicComment(id),
+        this.getMusicLyric(id),
+        this.getMusicUrl(id)
+      ]).then(() => {
+        loadingInstance.close();
+      });
+    },
     getMusicLyric(id) {
       const vm = this;
       fetch(`${baseUrl}/lyric?id=${id}`)
@@ -233,6 +264,22 @@ export default {
             vm.simiSongs = songs;
           }
         });
+    },
+    getMusicUrl(id) {
+      this.$store.commit({
+        type: "changeSourceLoading",
+        payload: true
+      });
+      // 获取播放的url资源
+      this.$store.dispatch({
+        type: "getMusicUrl",
+        id
+      });
+      // 获取歌曲详情
+      this.$store.dispatch({
+        type: "getMusicSource",
+        id
+      });
     },
     getTime(time) {
       return moment(time).format("YYYY年M月D日 hh:ss");
@@ -396,6 +443,10 @@ export default {
       .bottom {
         display: flex;
         justify-content: space-between;
+        p {
+          text-align: left;
+          font-size: 20px;
+        }
         .songComments {
           width: 70%;
           .comment {
@@ -424,11 +475,56 @@ export default {
               .comment-time {
                 display: flex;
                 justify-content: space-between;
-                i{
+                i {
                   margin-right: 5px;
                 }
               }
             }
+          }
+        }
+        .simiSongs {
+          width: 25%;
+          .simiSongCol {
+            display: flex;
+            text-align: left;
+            margin-bottom: 20px;
+            position: relative;
+            img {
+              min-width: 50px;
+              width: 50px;
+              height: 50px;
+              margin-right: 10px;
+            }
+            .simiSongsInfo {
+              display: flex;
+              flex-direction: column;
+              justify-content: space-around;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              width: 100%;
+              div {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 100%;
+              }
+            }
+          }
+          .simiSongCol ::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50px;
+            height: 50px;
+            background-image: url(../../src/assets/playMusic.png);
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+          }
+          .simiSongCol:hover {
+            cursor: pointer;
+            background: rgb(36, 38, 41);
           }
         }
       }
