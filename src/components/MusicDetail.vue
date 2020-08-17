@@ -107,7 +107,7 @@
 
 <script>
 import { Loading } from "element-ui";
-import { baseUrl } from "@/utiles/ip";
+import baseUrl from "@/utiles/ip";
 import moment from "moment";
 import _ from "lodash";
 export default {
@@ -116,8 +116,8 @@ export default {
       // 通过是否处于大屏状态控制 请求发送优化,但是因为网易云的那个图标也可以关闭大屏状态，所以移动到stroe中
       // bigScreenStatus: false,
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
@@ -125,7 +125,7 @@ export default {
       initHeight: 0,
       lyric: "",
       simiSongs: [],
-      songComment: []
+      songComment: [],
     };
   },
   mounted() {
@@ -146,22 +146,22 @@ export default {
       .removeEventListener("scroll", this.handleScrol, true);
   },
   computed: {
-    detail: function() {
+    detail: function () {
       return this.musicDetail;
     },
-    id: function() {
+    id: function () {
       return this.musicDetail.id;
-    }
+    },
   },
   watch: {
-    id: function() {
+    id: function () {
       document.getElementsByClassName(
         "top-filter"
       )[0].style.backgroundImage = `url(${this.musicDetail.al.picUrl})`;
       if (this.$store.state.isMusicPlayInBigScreen) {
         this.allSettled(this.musicDetail.id);
       }
-    }
+    },
   },
   methods: {
     handleScrol() {
@@ -201,7 +201,7 @@ export default {
       this.allSettled(this.detail.id);
       this.$store.commit({
         type: "changeBigScreenStatus",
-        payload: true
+        payload: true,
       });
     },
     goSmall() {
@@ -212,14 +212,14 @@ export default {
       bigScreen.style.transitionDelay = "0.2s";
       this.$store.commit({
         type: "changeBigScreenStatus",
-        payload: false
+        payload: false,
       });
     },
     // 歌词换行
     checkLines(str) {
       const reg = /\](.+?)(\r\n|\n|\r)/gm;
       let useP = "";
-      this.lyric.replace(reg, function(match, param, offset, string) {
+      this.lyric.replace(reg, function (match, param, offset, string) {
         useP += `<p>${param}</p>`;
       });
       return useP;
@@ -227,26 +227,26 @@ export default {
     // 合成一下请求，等这些请求都结束之后才撤销loading状态
     allSettled(id) {
       let loadingInstance = Loading.service({
-        background: "rgb(25, 27, 31)"
+        background: "rgb(25, 27, 31)",
       });
       Promise.allSettled([
         this.getSimiSongs(id),
         this.getMusicComment(id),
-        this.getMusicLyric(id)
+        this.getMusicLyric(id),
       ]).then(() => {
         loadingInstance.close();
       });
     },
     simiSongsClick(id) {
       let loadingInstance = Loading.service({
-        background: "rgb(25, 27, 31)"
+        background: "rgb(25, 27, 31)",
       });
       let vm = this;
       Promise.allSettled([
         this.getSimiSongs(id),
         this.getMusicComment(id),
         this.getMusicLyric(id),
-        this.getMusicUrl(id)
+        this.getMusicUrl(id),
       ]).then(() => {
         loadingInstance.close();
         setTimeout(() => {
@@ -257,13 +257,13 @@ export default {
     getMusicLyric(id) {
       const vm = this;
       fetch(`${baseUrl}/lyric?id=${id}`)
-        .then(res => {
+        .then((res) => {
           return Promise.resolve(res.json());
         })
-        .then(function(res) {
+        .then(function (res) {
           if (res.code === 200) {
             const {
-              lrc: { lyric }
+              lrc: { lyric },
             } = res;
             vm.lyric = lyric;
           }
@@ -272,10 +272,10 @@ export default {
     getMusicComment(id) {
       const vm = this;
       fetch(`${baseUrl}/comment/music?id=${id}`)
-        .then(res => {
+        .then((res) => {
           return Promise.resolve(res.json());
         })
-        .then(function(res) {
+        .then(function (res) {
           if (res.code === 200) {
             const { hotComments } = res;
             vm.songComment = hotComments;
@@ -285,10 +285,10 @@ export default {
     getSimiSongs(id) {
       const vm = this;
       fetch(`${baseUrl}/simi/song?id=${id}`)
-        .then(res => {
+        .then((res) => {
           return Promise.resolve(res.json());
         })
-        .then(function(res) {
+        .then(function (res) {
           if (res.code === 200) {
             const { songs } = res;
             vm.simiSongs = songs;
@@ -298,26 +298,26 @@ export default {
     getMusicUrl(id) {
       this.$store.commit({
         type: "changeSourceLoading",
-        payload: true
+        payload: true,
       });
       // 获取播放的url资源
       this.$store.dispatch({
         type: "getMusicUrl",
         id,
-        noUrlCallback: this.noUrl
+        noUrlCallback: this.noUrl,
       });
     },
     noUrl() {
       this.$notify({
         title: "资源获取失败",
         message: "因版权或VIP问题无法获取资源~~",
-        type: "warning"
+        type: "warning",
       });
     },
     getTime(time) {
       return moment(time).format("YYYY年M月D日 hh:ss");
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -56,7 +56,7 @@
 </template>
 <script>
 import { Loading } from "element-ui";
-import { baseUrl } from "@/utiles/ip";
+import baseUrl from "@/utiles/ip";
 export default {
   name: "home",
   data() {
@@ -65,22 +65,22 @@ export default {
       activeName: "selfRecommend",
       selected: "selfRecommend",
       templateShow: [], //这也就是最上面的轮播图暂时数据，没有找到究竟是哪一个接口就以这个展示
-      recommendSongs: []
+      recommendSongs: [],
     };
   },
   mounted() {
     //loading效果开启
     let loadingInstance = Loading.service({
       target: "#init_content",
-      background: "rgba(25, 27, 31, 1)"
+      background: "rgba(25, 27, 31, 1)",
     });
     const vm = this;
     //轮播信息获取
     fetch(`${baseUrl}/banner`)
-      .then(res => {
+      .then((res) => {
         return Promise.resolve(res.json());
       })
-      .then(function(res) {
+      .then(function (res) {
         if (res.code === 200) {
           vm.templateShow = res.banners;
           loadingInstance.close();
@@ -88,10 +88,10 @@ export default {
       });
     //推荐歌单获取
     fetch(`${baseUrl}/personalized?limit=10`)
-      .then(res => {
+      .then((res) => {
         return Promise.resolve(res.json());
       })
-      .then(function(res) {
+      .then(function (res) {
         if (res.code === 200) {
           vm.recommendSongs = res.result;
         }
@@ -102,7 +102,7 @@ export default {
     //添加对于顶部tab的事件监听
     let itemsPart = document.getElementById("topTabs");
     const that = this;
-    itemsPart.addEventListener("click", function(e) {
+    itemsPart.addEventListener("click", function (e) {
       let obj = {};
       var event = e || window.event;
       var target = event.target || event.srcElement || obj;
@@ -130,9 +130,9 @@ export default {
     },
     goToSongSheet(id) {
       this.$router.push(`/side/songSheet/${id}`);
-    }
+    },
   },
-  watch: {}
+  watch: {},
 };
 </script>
 <style scoped lang="less">

@@ -92,10 +92,10 @@
 import moment from "moment";
 import SongList from "@/components/SongList.vue";
 import { Loading } from "element-ui";
-import { baseUrl } from "@/utiles/ip";
+import baseUrl from "@/utiles/ip";
 export default {
   components: {
-    SongList
+    SongList,
   },
   data() {
     return {
@@ -108,8 +108,8 @@ export default {
       detailInfo: {
         playlist: {
           creator: {},
-          description: ""
-        }
+          description: "",
+        },
       },
       column: [
         {
@@ -119,22 +119,22 @@ export default {
           hiddenText: true,
           style: {
             "text-align": "right",
-            "padding-right": "6px"
+            "padding-right": "6px",
           },
           render: (record, index, preExit) => {
             return this.getIndex(index + preExit);
-          }
+          },
         },
         {
           title: "操作",
           key: "action",
-          col: 1
+          col: 1,
         },
         {
           title: "音乐标题",
           key: "name",
           dataIndex: "name",
-          col: 7
+          col: 7,
         },
         {
           title: "歌手",
@@ -143,37 +143,37 @@ export default {
           col: 6,
           render: (record, index) => {
             return this.getSongerName(record.ar);
-          }
+          },
         },
         {
           title: "专辑",
           key: "al",
           dataIndex: "al",
           col: 5,
-          render: record => {
+          render: (record) => {
             return record.al.name;
           },
           sort: (pre, next) => {
             return pre.al.name.length - next.al.name.length;
-          }
+          },
         },
         {
           title: "时长",
           dataIndex: "dt",
           key: "dt",
           col: 4,
-          render: record => {
+          render: (record) => {
             return this.getTime(record.dt);
           },
           sort: (pre, next) => {
             return pre.dt - next.dt;
-          }
-        }
+          },
+        },
       ],
       // 歌单展示组件中所需，一个为滑块的相对挂载dom，一个为影响可视区域的高德，一个为影响滑块加载判断的高度
       songListRalativeDom: null,
       songListEffectClientHeight: 0,
-      songListEffectOffsetHeight: 0
+      songListEffectOffsetHeight: 0,
     };
   },
 
@@ -186,18 +186,18 @@ export default {
       document.getElementById("top-brief").clientHeight + 30;
 
     const {
-      params: { id }
+      params: { id },
     } = this.$route;
     let loadingInstance = Loading.service({
       target: ".song-sheet-border",
-      background: "rgba(25, 27, 31, 1)"
+      background: "rgba(25, 27, 31, 1)",
     });
     const vm = this;
     fetch(`${baseUrl}/playlist/detail?id=${id}`)
-      .then(res => {
+      .then((res) => {
         return Promise.resolve(res.json());
       })
-      .then(function(res) {
+      .then(function (res) {
         if (res.code === 200) {
           vm.detailInfo = res;
           vm.songList = res.playlist.tracks;
@@ -206,10 +206,10 @@ export default {
         }
       });
     fetch(`${baseUrl}/comment/playlist?id=${id}`)
-      .then(res => {
+      .then((res) => {
         return Promise.resolve(res.json());
       })
-      .then(function(res) {
+      .then(function (res) {
         if (res.code === 200) {
           vm.commentNums = res.total;
         }
@@ -286,22 +286,22 @@ export default {
       this.$notify({
         title: "资源获取失败",
         message: "因版权或VIP问题无法获取资源~~",
-        type: "warning"
+        type: "warning",
       });
     },
     getMusicUrl(record) {
       this.$store.commit({
         type: "changeSourceLoading",
-        payload: true
+        payload: true,
       });
       // 获取播放的url资源
       this.$store.dispatch({
         type: "getMusicUrl",
         id: record.id,
-        noUrlCallback: this.noUrl
+        noUrlCallback: this.noUrl,
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
