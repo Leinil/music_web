@@ -2,7 +2,7 @@
   <div id="homeContainer">
     <div>
       <div id="top">
-        <HomePageTopbar />
+        <MusicPageTopbar />
       </div>
       <router-view></router-view>
     </div>
@@ -11,11 +11,11 @@
 
 <script>
 // @ is an alias to /src
-import HomePageTopbar from "@/views/HomePageTopbar.vue";
+import MusicPageTopbar from "@/views/MusicPageTopbar.vue";
 export default {
   name: "home",
   components: {
-    HomePageTopbar,
+    MusicPageTopbar,
   },
   data() {
     return {};

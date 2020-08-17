@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <Home />
+    <UnitePage />
   </div>
 </template>
 
 <script>
-import Home from "@/views/Home.vue";
+import UnitePage from "@/views/UnitePage.vue";
 export default {
   name: "app",
   components: {
-    Home
+    UnitePage
   }
 };
 </script>

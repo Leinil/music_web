@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="side">
-      <HomaPageSidebar />
+      <MusicPageSidebar />
     </div>
     <div id="content">
       <router-view></router-view>
@@ -12,12 +12,12 @@
 
 <script>
 // @ is an alias to /src
-import HomaPageSidebar from "@/views/HomePageSidebar.vue";
+import MusicPageSidebar from "@/views/MusicPageSidebar.vue";
 import MusicPlayer from "@/views/publicPages/musicPlayer.vue";
 export default {
   name: "home",
   components: {
-    HomaPageSidebar,
+    MusicPageSidebar,
     "music-player": MusicPlayer
   },
   data() {

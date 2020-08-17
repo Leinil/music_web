@@ -42,7 +42,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import router from "../router";
 
 @Component
-export default class HomePageSidebar extends Vue {
+export default class MusicPageSidebar extends Vue {
   name: string = "sideBar";
   selected: string = ""; //选择的侧边栏
   data() {

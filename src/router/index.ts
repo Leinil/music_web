@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import initHome from '@/views/InitHome.vue'
-import SideContent from '@/views/showSideContent.vue';
+import MusicPage from '@/views/MusicPage.vue'
+import SideContent from '@/views/MusicPageSidebarContent.vue';
 import FindMusicIndex from "@/views/musicContentPages/finMusic/index.vue";
 import VideoContent from '@/views/showVideoContent.vue';
 import SongSheet from '@/views/publicPages/songSheet.vue';
@@ -16,7 +16,7 @@ const routes = [
   {
     path: '/',
     redirect: "/index",
-    component: initHome,
+    component: MusicPage,
     children: [
       {
         path: 'index',
