@@ -3,7 +3,7 @@ import baseUrl from './ip';
 import { Message } from 'element-ui';
 
 const service = axios.create({
-    baseUrl
+    baseURL: baseUrl
 })
 // http request
 service.interceptors.request.use((config) => {
@@ -14,7 +14,7 @@ service.interceptors.request.use((config) => {
 
 // http response
 service.interceptors.response.use((response) => {
-    return response;
+    return response.data;
 }, (error) => {
     return Promise.reject(error);
 })

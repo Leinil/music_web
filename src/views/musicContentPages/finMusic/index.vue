@@ -51,6 +51,15 @@
           <i class="el-icon-arrow-right"></i>
         </span>
       </div>
+      <div class="specialShow">
+        <div v-for="(item,index) in specialShow" :key="index" class="border">
+          <div class="camera">
+            <img src="../../../../src/assets/camera.png" :width="40" :height="35" />
+          </div>
+          <img :src="item.picUrl" />
+          <span>{{item.name}}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -66,6 +75,7 @@ export default {
       selected: "selfRecommend",
       templateShow: [], //这也就是最上面的轮播图暂时数据，没有找到究竟是哪一个接口就以这个展示
       recommendSongs: [],
+      specialShow: [], // 独家放送
     };
   },
   mounted() {
@@ -96,9 +106,10 @@ export default {
           vm.recommendSongs = res.result;
         }
       });
-    //推荐歌单获取2434388371
-    // fetch(`http://localhost:3000/song/detail?ids=441491828`);
-    // fetch(`http://localhost:3000/playlist/detail?id=2434388371`);
+    //独家放送
+    this.$axios.get("/personalized/privatecontent").then((res) => {
+      vm.specialShow = res.result;
+    });
     //添加对于顶部tab的事件监听
     let itemsPart = document.getElementById("topTabs");
     const that = this;
@@ -243,6 +254,50 @@ export default {
     width: 100%;
     height: 100%;
     top: 0;
+    left: 0;
+  }
+}
+.specialShow {
+  display: flex;
+  justify-content: space-between;
+  .border {
+    cursor: pointer;
+    font-size: 13px;
+    text-align: left;
+    color: white;
+    width: 32%;
+    padding-bottom: 12%;
+    position: relative;
+    margin: 10px 0px 65px 0px;
+  }
+  .border img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
+  .camera {
+    position: absolute;
+    background-color: rgba(1, 1, 1, 0.5);
+    left: 2%;
+    top: 2%;
+    width: 30px;
+    height: 30px;
+    border: 1px solid white;
+    border-radius: 50%;
+    z-index: 9;
+    > img {
+      position: absolute;
+      left: 20%;
+      top: 20%;
+      width: 60%;
+      height: 60%;
+    }
+  }
+  .border > span {
+    position: absolute;
+    top: 105%;
     left: 0;
   }
 }
