@@ -200,10 +200,30 @@ export default {
       .then(function (res) {
         if (res.code === 200) {
           vm.detailInfo = res;
-          vm.songList = res.playlist.tracks;
           vm.checkLines(res.playlist.description);
           loadingInstance.close();
+          return res.playlist.trackIds;
         }
+      })
+      .then((trackIds) => {
+        // 通过歌单的返回值 获取id数组 再调用歌曲详情接口
+        let idStr = trackIds.reduce((total, item, index, arr) => {
+          if (index < arr.length - 1) {
+            total += item.id + ",";
+          } else {
+            total += item.id;
+          }
+          return total;
+        }, "");
+        fetch(`${baseUrl}/song/detail?ids=${idStr}`)
+          .then((res) => {
+            return Promise.resolve(res.json());
+          })
+          .then((res) => {
+            if (res.code === 200) {
+              vm.songList = res.songs;
+            }
+          });
       });
     fetch(`${baseUrl}/comment/playlist?id=${id}`)
       .then((res) => {
