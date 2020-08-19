@@ -60,6 +60,32 @@
           <span>{{item.name}}</span>
         </div>
       </div>
+      <div class="title">
+        <span>最新音乐</span>
+        <span>
+          更多
+          <i class="el-icon-arrow-right"></i>
+        </span>
+      </div>
+      <div class="newestMusic">
+        <div v-for="(item,index) in newMusic" :key="index" class="musicItem">
+          <div class="musicItemLeft">{{index+1}}</div>
+          <div class="musicItemRight">
+            <div class="musicImg">
+              <img :src="item.picUrl" />
+            </div>
+            <div class="musicInfo">
+              <div>
+                {{item.name}}
+                <span
+                  style="color:gray"
+                >{{item.song.alias.length>0?`(${item.song.alias[0]})`:''}}</span>
+              </div>
+              <div :title="getSongerName(item.song.artists)">{{getSongerName(item.song.artists)}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -76,6 +102,7 @@ export default {
       templateShow: [], //这也就是最上面的轮播图暂时数据，没有找到究竟是哪一个接口就以这个展示
       recommendSongs: [],
       specialShow: [], // 独家放送
+      newMusic: [], // 最新音乐
     };
   },
   mounted() {
@@ -110,6 +137,13 @@ export default {
     this.$axios.get("/personalized/privatecontent").then((res) => {
       vm.specialShow = res.result;
     });
+    //最新音乐
+    this.$axios.get("/personalized/newsong").then((res) => {
+      vm.newMusic = res.result;
+      // res.result.map((item) => {
+      //   console.log(item.song.album.alias, item.name);
+      // });
+    });
     //添加对于顶部tab的事件监听
     let itemsPart = document.getElementById("topTabs");
     const that = this;
@@ -141,6 +175,15 @@ export default {
     },
     goToSongSheet(id) {
       this.$router.push(`/side/songSheet/${id}`);
+    },
+    getSongerName(arr) {
+      let res = "";
+      for (let i = 0; i <= arr.length - 1; i++) {
+        i < arr.length - 1
+          ? (res += arr[i].name + " / ")
+          : (res += arr[i].name);
+      }
+      return res;
     },
   },
   watch: {},
@@ -312,6 +355,67 @@ export default {
   & > span:first-child {
     color: white;
     font-size: 18px;
+  }
+}
+.newestMusic {
+  // border: 1px solid white;
+  border: 0.5px solid rgb(35, 38, 44);
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 5px;
+  > div {
+    width: 50%;
+  }
+  .musicItem {
+    border-right: 0.5px solid rgb(35, 38, 44);
+    margin-right: -1px;
+    color: white;
+    text-align: left;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    .musicItemLeft {
+      margin: 15px;
+      width: 10px;
+    }
+    .musicItemRight {
+      padding: 10px 0px;
+      display: flex;
+      width: 100%;
+      .musicImg {
+        position: relative;
+        width: 10%;
+        padding-bottom: 10%;
+        > img {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .musicImg::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url(../../../../src/assets/playMusic.png);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+      .musicInfo {
+        margin-left: 5px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+    }
+  }
+  .musicItem:hover {
+    cursor: pointer;
+    background: rgb(36, 38, 41);
   }
 }
 #topTabs {
