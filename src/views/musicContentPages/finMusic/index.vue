@@ -9,141 +9,25 @@
       <div id="newest">最新音乐</div>
     </div>
     <div id="init_content">
-      <div class="carousel">
-        <el-carousel :interval="40000" type="card" height="185px">
-          <el-carousel-item v-for="(item,index) in templateShow" :key="index">
-            <img :src="item.imageUrl" class="img" />
-          </el-carousel-item>
-        </el-carousel>
-      </div>
-      <div class="title">
-        <span>推荐歌单</span>
-        <span>
-          更多
-          <i class="el-icon-arrow-right"></i>
-        </span>
-      </div>
-      <div class="recommendSongs">
-        <div
-          v-for="(item,index) in recommendSongs"
-          :key="index"
-          class="recommendBorder"
-          @click="goToSongSheet(item.id)"
-        >
-          <img :src="item.picUrl" />
-          <span>{{item.name}}</span>
-          <div class="hoverBorder">
-            <div class="playCount">
-              <i class="el-icon-headset"></i>
-              {{getPlayCount(item.playCount)}}
-            </div>
-            <div>
-              <p class="reson">{{item.copywriter}}</p>
-            </div>
-            <div class="playIcon"></div>
-          </div>
-        </div>
-      </div>
-      <div class="title">
-        <span>独家放送</span>
-        <span>
-          更多
-          <i class="el-icon-arrow-right"></i>
-        </span>
-      </div>
-      <div class="specialShow">
-        <div v-for="(item,index) in specialShow" :key="index" class="border">
-          <div class="camera">
-            <img src="../../../../src/assets/camera.png" :width="40" :height="35" />
-          </div>
-          <img :src="item.picUrl" />
-          <span>{{item.name}}</span>
-        </div>
-      </div>
-      <div class="title">
-        <span>最新音乐</span>
-        <span>
-          更多
-          <i class="el-icon-arrow-right"></i>
-        </span>
-      </div>
-      <div class="newestMusic">
-        <div v-for="(item,index) in newMusic" :key="index" class="musicItem">
-          <div class="musicItemLeft">{{index+1}}</div>
-          <div class="musicItemRight">
-            <div class="musicImg">
-              <img :src="item.picUrl" />
-            </div>
-            <div class="musicInfo">
-              <div>
-                {{item.name}}
-                <span
-                  style="color:gray"
-                >{{item.song.alias.length>0?`(${item.song.alias[0]})`:''}}</span>
-              </div>
-              <div :title="getSongerName(item.song.artists)">{{getSongerName(item.song.artists)}}</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PersonalRecommend />
     </div>
   </div>
 </template>
 <script>
-import { Loading } from "element-ui";
-import baseUrl from "@/utiles/ip";
+import PersonalRecommend from "./personalRecommend/index.vue";
 export default {
   name: "home",
+  components: {
+    PersonalRecommend,
+  },
   data() {
     return {
       loading: true,
       activeName: "selfRecommend",
       selected: "selfRecommend",
-      templateShow: [], //这也就是最上面的轮播图暂时数据，没有找到究竟是哪一个接口就以这个展示
-      recommendSongs: [],
-      specialShow: [], // 独家放送
-      newMusic: [], // 最新音乐
     };
   },
   mounted() {
-    //loading效果开启
-    let loadingInstance = Loading.service({
-      target: "#init_content",
-      background: "rgba(25, 27, 31, 1)",
-    });
-    const vm = this;
-    //轮播信息获取
-    fetch(`${baseUrl}/banner`)
-      .then((res) => {
-        return Promise.resolve(res.json());
-      })
-      .then(function (res) {
-        if (res.code === 200) {
-          vm.templateShow = res.banners;
-          loadingInstance.close();
-        }
-      });
-    //推荐歌单获取
-    fetch(`${baseUrl}/personalized?limit=10`)
-      .then((res) => {
-        return Promise.resolve(res.json());
-      })
-      .then(function (res) {
-        if (res.code === 200) {
-          vm.recommendSongs = res.result;
-        }
-      });
-    //独家放送
-    this.$axios.get("/personalized/privatecontent").then((res) => {
-      vm.specialShow = res.result;
-    });
-    //最新音乐
-    this.$axios.get("/personalized/newsong").then((res) => {
-      vm.newMusic = res.result;
-      // res.result.map((item) => {
-      //   console.log(item.song.album.alias, item.name);
-      // });
-    });
     //添加对于顶部tab的事件监听
     let itemsPart = document.getElementById("topTabs");
     const that = this;
@@ -167,256 +51,22 @@ export default {
       }
     });
   },
-  methods: {
-    getPlayCount(num) {
-      let str;
-      num / 100000 > 0 ? (str = `${(num / 10000).toFixed()}万`) : (str = num);
-      return str;
-    },
-    goToSongSheet(id) {
-      this.$router.push(`/side/songSheet/${id}`);
-    },
-    getSongerName(arr) {
-      let res = "";
-      for (let i = 0; i <= arr.length - 1; i++) {
-        i < arr.length - 1
-          ? (res += arr[i].name + " / ")
-          : (res += arr[i].name);
-      }
-      return res;
-    },
-  },
-  watch: {},
 };
 </script>
 <style scoped lang="less">
+@media screen and(max-width: 1280px) {
+  #init_content {
+    width: 80%;
+  }
+}
+@media screen and(min-width: 1280px) {
+  #init_content {
+    width: 60%;
+  }
+}
 .outestBorder {
   overflow: auto;
   height: 100%;
-}
-.recommendSongs {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  font-size: 13px;
-  .recommendBorder {
-    width: 19%;
-    padding-bottom: 19%;
-    position: relative;
-    margin: 10px 0px 65px 0px;
-
-    .hoverBorder {
-      cursor: pointer;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      .reson {
-        margin: 0;
-        overflow: hidden; /*超出隐藏*/
-        text-overflow: ellipsis; /*文本溢出时显示省略标记*/
-        display: -webkit-box; /*设置弹性盒模型*/
-        -webkit-line-clamp: 2; /*文本占的行数,如果要设置2行加...则设置为2*/
-        -webkit-box-orient: vertical; /*子代元素垂直显示*/
-      }
-      .playCount {
-        font-size: 10px;
-        position: absolute;
-        width: 100%;
-        text-align: right;
-        color: white;
-        padding: 2px 10px;
-        z-index: 9;
-        transition: all 0.2s;
-        transition-delay: 0.5s;
-        transition-timing-function: cubic-bezier(0, 0, 1, 1);
-        background-image: linear-gradient(
-          90deg,
-          transparent 50%,
-          rgba(0, 0, 0, 0.5)
-        );
-        box-sizing: border-box;
-        i {
-          width: 10px;
-          height: 10px;
-          margin-right: 2px;
-        }
-      }
-      div:nth-child(2) {
-        position: absolute;
-        top: -30%;
-        text-align: left;
-        color: white;
-        font-size: 13px;
-        width: 100%;
-        padding: 9px;
-        transition: all 0.2s;
-        transition-delay: 0.5s;
-        transition-timing-function: cubic-bezier(0, 0, 1, 1);
-        box-sizing: border-box;
-        background-color: rgba(32, 32, 32, 0.8);
-        @media screen and (max-width: 1380px) {
-          padding: 0px 5px;
-        }
-      }
-      .playIcon {
-        opacity: 0;
-        width: 36px;
-        height: 36px;
-        // border:1px solid white;
-        position: absolute;
-        right: 2%;
-        bottom: 2%;
-        background-image: url(../../../../src/assets/playbar.png);
-        background-repeat: no-repeat;
-        background-position: 0 -204px;
-        // background-size: 100% 100%;
-      }
-    }
-    .hoverBorder:hover {
-      .playCount {
-        opacity: 0;
-      }
-      :nth-child(2) {
-        top: 0;
-      }
-      .playIcon {
-        opacity: 0.7;
-      }
-    }
-    > span {
-      position: absolute;
-      left: 0;
-      top: 102%;
-      color: white;
-      text-align: left;
-    }
-  }
-  .recommendBorder > img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-  }
-}
-.specialShow {
-  display: flex;
-  justify-content: space-between;
-  .border {
-    cursor: pointer;
-    font-size: 13px;
-    text-align: left;
-    color: white;
-    width: 32%;
-    padding-bottom: 12%;
-    position: relative;
-    margin: 10px 0px 65px 0px;
-  }
-  .border img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-  }
-  .camera {
-    position: absolute;
-    background-color: rgba(1, 1, 1, 0.5);
-    left: 2%;
-    top: 2%;
-    width: 30px;
-    height: 30px;
-    border: 1px solid white;
-    border-radius: 50%;
-    z-index: 9;
-    > img {
-      position: absolute;
-      left: 20%;
-      top: 20%;
-      width: 60%;
-      height: 60%;
-    }
-  }
-  .border > span {
-    position: absolute;
-    top: 105%;
-    left: 0;
-  }
-}
-.title {
-  color: rgb(130, 131, 133);
-  padding: 10px 0px;
-  font-size: 13px;
-  border-bottom: 0.5px solid rgb(35, 38, 44);
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  & > span:first-child {
-    color: white;
-    font-size: 18px;
-  }
-}
-.newestMusic {
-  // border: 1px solid white;
-  border: 0.5px solid rgb(35, 38, 44);
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 5px;
-  > div {
-    width: 50%;
-  }
-  .musicItem {
-    border-right: 0.5px solid rgb(35, 38, 44);
-    margin-right: -1px;
-    color: white;
-    text-align: left;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    .musicItemLeft {
-      margin: 15px;
-      width: 10px;
-    }
-    .musicItemRight {
-      padding: 10px 0px;
-      display: flex;
-      width: 100%;
-      .musicImg {
-        position: relative;
-        width: 10%;
-        padding-bottom: 10%;
-        > img {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-        }
-      }
-      .musicImg::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url(../../../../src/assets/playMusic.png);
-        background-repeat: no-repeat;
-        background-size: 100% 100%;
-      }
-      .musicInfo {
-        margin-left: 5px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
-    }
-  }
-  .musicItem:hover {
-    cursor: pointer;
-    background: rgb(36, 38, 41);
-  }
 }
 #topTabs {
   display: flex;
@@ -438,16 +88,6 @@ export default {
 #init_content {
   min-height: 200px;
   margin: 0 auto;
-}
-@media screen and(max-width: 1280px) {
-  #init_content {
-    width: 80%;
-  }
-}
-@media screen and(min-width: 1280px) {
-  #init_content {
-    width: 60%;
-  }
 }
 .carousel {
   padding-top: 10px;
