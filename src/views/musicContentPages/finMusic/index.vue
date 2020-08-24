@@ -9,22 +9,27 @@
       <div id="newest">最新音乐</div>
     </div>
     <div id="init_content">
-      <PersonalRecommend />
+      <keep-alive>
+        <component :is="tabContent"></component>
+      </keep-alive>
     </div>
   </div>
 </template>
 <script>
-import PersonalRecommend from "./personalRecommend/index.vue";
+import PersonalRecommend from "./personalRecommend/index";
+import SongList from "./songList/index";
 export default {
   name: "home",
   components: {
     PersonalRecommend,
+    SongList,
   },
   data() {
     return {
       loading: true,
       activeName: "selfRecommend",
       selected: "selfRecommend",
+      tabContent: PersonalRecommend, // 个性推荐，歌单，主播电台，排行榜等内容
     };
   },
   mounted() {
@@ -48,6 +53,14 @@ export default {
           oldTarget.classList.remove("checked");
         }
         that.selected = target.id;
+        switch (target.id) {
+          case "selfRecommend": // 个性推荐
+            that.tabContent = PersonalRecommend;
+            break;
+          case "sheet": // 歌单
+            that.tabContent = SongList;
+            break;
+        }
       }
     });
   },
