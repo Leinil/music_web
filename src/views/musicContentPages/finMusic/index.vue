@@ -99,7 +99,7 @@ export default {
   color: white;
 }
 #init_content {
-  min-height: 200px;
+  height: 100%;
   margin: 0 auto;
 }
 .carousel {
