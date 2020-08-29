@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="carousel">
-      <el-carousel :interval="40000" type="card" height="185px">
+      <el-carousel :interval="40000" type="card" height="150px">
         <el-carousel-item v-for="(item,index) in templateShow" :key="index">
           <img :src="item.imageUrl" class="img" />
         </el-carousel-item>

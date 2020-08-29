@@ -18,11 +18,13 @@
 <script>
 import PersonalRecommend from "./personalRecommend/index";
 import SongList from "./songList/index";
+import AnchorStation from "./anchorStation/index";
 export default {
   name: "home",
   components: {
     PersonalRecommend,
     SongList,
+    AnchorStation,
   },
   data() {
     return {
@@ -59,6 +61,9 @@ export default {
             break;
           case "sheet": // 歌单
             that.tabContent = SongList;
+            break;
+          case "station":
+            that.tabContent = AnchorStation;
             break;
         }
       }

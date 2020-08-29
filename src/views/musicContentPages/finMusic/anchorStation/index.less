@@ -1,0 +1,82 @@
+.dj_border{
+    text-align: left;
+    color: rgb(130, 131, 133);
+    .dj_banner{
+        margin: 10px 0px;
+        .dj_banner_img{
+            width: 100%;
+        }
+    }
+    .dj_type{
+        .dj_type_border{
+            display: flex;
+            justify-content: space-between;
+            .dj_card{
+                padding: 5px 10px;
+                text-align: center;
+                cursor: pointer;
+                color: rgb(173, 175, 178);
+                font-size: 13px;
+                >span{
+                    margin: 5px 0px;
+                    display: block;
+                }
+                .dj_type_img{
+                    width: 50px;
+                    height: 50px;
+                    margin: 0 auto;
+                    background-size: 100% 100%;
+                }
+                >img{
+                    background-position: 50%,50%;
+                    background-size: 100%;
+                }
+            }
+            .dj_card:hover{
+                background-color: rgb(37,39,43);
+                border-radius: 5px;
+            }
+        }
+    }
+    .title {
+        color: rgb(130, 131, 133);
+        padding: 10px 0px;
+        font-size: 13px;
+        border-bottom: 0.5px solid rgb(35, 38, 44);
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+    
+        &>span:first-child {
+          color: white;
+          font-size: 18px;
+        }
+    }
+    .dj_detail_list{
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        .dj_detail_item{
+            cursor: pointer;
+            width: 16%;
+            >img{
+                width: 100%;
+            }
+            .dj_detail_desc{
+                color: white;
+                font-size: 13px;
+                margin: 0;
+                overflow: hidden;
+                /*超出隐藏*/
+                text-overflow: ellipsis;
+                /*文本溢出时显示省略标记*/
+                display: -webkit-box;
+                /*设置弹性盒模型*/
+                -webkit-line-clamp: 2;
+                /*文本占的行数,如果要设置2行加...则设置为2*/
+                -webkit-box-orient: vertical;
+                /*子代元素垂直显示*/
+            }
+        }
+    }
+}
