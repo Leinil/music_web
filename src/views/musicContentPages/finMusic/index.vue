@@ -19,12 +19,14 @@
 import PersonalRecommend from "./personalRecommend/index";
 import SongList from "./songList/index";
 import AnchorStation from "./anchorStation/index";
+import Ranking from "./Ranking/index";
 export default {
   name: "home",
   components: {
     PersonalRecommend,
     SongList,
     AnchorStation,
+    Ranking,
   },
   data() {
     return {
@@ -65,6 +67,8 @@ export default {
           case "station":
             that.tabContent = AnchorStation;
             break;
+          case "list":
+            that.tabContent = Ranking;
         }
       }
     });

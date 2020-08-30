@@ -2,7 +2,7 @@
   <div class="dj_border">
     <!-- 电台主播轮播图展示 -->
     <div class="dj_banner">
-      <el-carousel :interval="40000" type="card" height="150px">
+      <el-carousel :interval="40000" type="card" height="200px">
         <el-carousel-item v-for="(item,index) in djBanner" :key="index">
           <img :src="item.pic" class="dj_banner_img" />
         </el-carousel-item>
@@ -49,7 +49,7 @@ export default {
     return {
       djBanner: [],
       djType: [],
-      djTopThreeDetail: [],
+      djTopThreeDetail: [[], [], []],
       djTopThreeName: [],
     };
   },
@@ -58,13 +58,9 @@ export default {
     this.$axios.get("/dj/banner").then((res) => {
       this.djBanner = res.data;
     });
-    // 电台推荐
-    this.$axios.get("/personalized/djprogram").then((res) => {
-      console.log(res);
-    });
     // 电台分类
     this.$axios.get("/dj/catelist").then((res) => {
-      const { categories } = res;
+      const { categories = [] } = res;
       const typeSplice = [];
       for (let i = 0; i < categories.length; i++) {
         typeSplice.push(categories.slice(i, i + 10));
@@ -73,15 +69,20 @@ export default {
       this.djType = typeSplice;
       // 拿到分类列表之后 取前三个来展示
       const topTree = categories.slice(0, 3);
-      const tempArrrDetail = [];
+      // 拿名字
       const tempArrName = [];
-      topTree.map((type) => {
+      // 拿电台数组
+      const tempArrDetail=[];
+      const tempArrrDetailAsync = topTree.map((type) => {
         tempArrName.push(type.name);
-        this.$axios.get(`/dj/recommend/type?type=${type.id}`).then((res) => {
-          tempArrrDetail.push(res.djRadios);
-        });
+        return this.$axios.get(`/dj/recommend/type?type=${type.id}`);
       });
-      this.djTopThreeDetail = tempArrrDetail;
+      Promise.all(tempArrrDetailAsync).then((res) => {
+        res.map(list=>{
+          tempArrDetail.push(list.djRadios)
+        })
+        this.djTopThreeDetail=tempArrDetail;
+      });
       this.djTopThreeName = tempArrName;
     });
   },
