@@ -72,6 +72,7 @@ export default class MusicPageSidebar extends Vue {
         }
       });
     });
+    
   }
 }
 </script>

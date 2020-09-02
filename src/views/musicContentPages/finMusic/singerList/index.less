@@ -1,0 +1,44 @@
+.singer_border{
+    text-align: left;
+    color: #828385;
+    font-size: 13px;
+    .list{
+        margin: 10px 0px;
+        .active{
+            background:  rgb(84,87,95);
+            color: black;
+            border-radius: 2px;
+        }
+        display: flex;
+        .left{
+            word-break: keep-all;
+        }
+        .songer_page_selectTypeList_right{
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            .button_border{
+                padding: 0px 8px;
+            }
+            >div{
+                display: flex;
+                align-items: flex-start;
+                margin-bottom: 10px;
+                >div{
+                    word-break: keep-all;
+                    cursor: pointer;
+                }
+                >div:hover{
+                    color: white;
+                }
+                >span{
+                    display: block;
+                    margin: 0 4px;
+                }
+            }
+        }
+    }
+}
+.flex{
+    display: flex;
+}
