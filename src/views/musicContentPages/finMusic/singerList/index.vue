@@ -1,5 +1,5 @@
 <template>
-  <div class="singer_border">
+  <div class="singer_content_border">
     <div class="list">
       <div class="left">语种：</div>
       <div class="songer_page_selectTypeList_right">
@@ -30,6 +30,12 @@
         </div>
       </div>
     </div>
+    <div class="show_singer">
+      <div v-for="(singer,index) in songerList" :key="index" class="singer_border">
+        <img :src="singer.img1v1Url" alt />
+        <span>{{singer.name}}</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -50,9 +56,11 @@ export default {
         area: "",
         initial: "",
       },
+      songerList: [],
     };
   },
   mounted() {
+    this.getSongerList(-1,-1,-1)
     const typeTransObj = {
       全部: -1,
       男歌手: 1,
@@ -126,12 +134,14 @@ export default {
   },
   methods: {
     getSongerList(type, area, initial) {
-      console.log(type, area, initial);
       let url = "/artist/list?";
       type !== "" ? (url += `&type=${type}`) : url;
       area !== "" ? (url += `&area=${area}`) : url;
       initial !== "" ? (url += `&initial=${initial}`) : url;
-      this.$axios.get(url);
+      this.$axios.get(url).then((res) => {
+        console.log(res.artists) 
+        this.songerList = res.artists;
+      });
     },
   },
 };
