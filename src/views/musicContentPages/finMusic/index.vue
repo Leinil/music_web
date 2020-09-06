@@ -21,6 +21,7 @@ import SongList from "./songList/index";
 import AnchorStation from "./anchorStation/index";
 import Ranking from "./Ranking/index";
 import SingerList from "./singerList/index";
+import NewestMusic from "./newestMusic/index";
 export default {
   name: "home",
   components: {
@@ -29,6 +30,7 @@ export default {
     AnchorStation,
     Ranking,
     SingerList,
+    NewestMusic,
   },
   data() {
     return {
@@ -75,6 +77,8 @@ export default {
           case "singers":
             that.tabContent = SingerList;
             break;
+          case "newest":
+            that.tabContent = NewestMusic;
         }
       }
     });

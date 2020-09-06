@@ -310,7 +310,6 @@ export default {
       });
     },
     getMusicUrl(record) {
-      console.log(record);
       this.$store.commit({
         type: "changeSourceLoading",
         payload: true,

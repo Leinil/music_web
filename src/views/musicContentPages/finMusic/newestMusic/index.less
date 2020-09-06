@@ -1,0 +1,107 @@
+.newest_music_border{
+    text-align: left;
+    color: rgb(130, 131, 133);
+    font-size: 13px;
+    .top_button{
+        margin: 20px 0px 10px 0px;
+        display: flex;
+        justify-content: center;
+        .top_button_border{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid  rgb(58,58,63);
+            border-radius: 5px;
+            overflow: hidden;
+            >div{
+                cursor: pointer;
+                padding: 5px 25px;
+            }
+            >div:hover{
+                background:rgb(32,34,38);
+            }
+            .active{
+                background:rgb(58,58,63);
+                color: white;
+            }
+            .active:hover{
+                background:rgb(58,58,63);
+            }
+        }
+    }
+    .song_type_line{
+        font-size: 16px;
+        padding-bottom:5px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid rgb(35, 38, 44);
+        >span{
+            cursor: pointer;
+            margin-right: 15px;
+            padding-bottom:6px;
+        }
+        >span:hover{
+            color: white;
+        }
+        .active{
+            position: relative;
+            color: white;
+        }
+        .active::after{
+            content: '';
+            left: 0;
+            top: 100%;
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: rgb(58,58,63);
+        }
+    }
+    .lighter{
+        background:rgb(35,37,41);
+    }
+    .song_list{
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        padding:10px 0px;
+        .song_img{
+            width: 40px;
+            height: 40px;
+            >img{
+                width: 100%;
+            }
+        }
+        >div:nth-child(1){
+            text-align: center;
+            width: 40px;
+            flex: 0 1 auto;
+        }
+        >div:nth-child(2){
+            flex: 0 1 auto;
+        }
+        >div:nth-child(3){
+            padding-left: 15px;
+            color: white;
+            flex: 3 1;
+        }
+        >div:nth-child(4){
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 2 1;
+        }
+        >div:nth-child(5){
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 2 1;
+        }
+        >div:nth-child(6){
+            flex: 1 1;
+            text-align: center;
+        }
+    }
+    .song_list:hover{
+        background: rgb(32,34,39);
+    }
+}
