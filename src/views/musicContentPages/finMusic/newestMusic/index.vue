@@ -7,11 +7,11 @@
       </div>
     </div>
     <div class="song_type_line">
-      <span class="active">全部</span>
-      <span>华语</span>
-      <span>欧美</span>
-      <span>韩国</span>
-      <span>日本</span>
+      <span @click="switchType('0')" :class="selectedType==='0'?'active':''">全部</span>
+      <span @click="switchType('7')" :class="selectedType==='7'?'active':''">华语</span>
+      <span @click="switchType('96')" :class="selectedType==='96'?'active':''">欧美</span>
+      <span @click="switchType('16')" :class="selectedType==='16'?'active':''">韩国</span>
+      <span @click="switchType('8')" :class="selectedType==='8'?'active':''">日本</span>
     </div>
     <div
       :class="[index%2===0 ? 'lighter' : '', 'song_list']"
@@ -21,7 +21,7 @@
     >
       <div>{{index+1}}</div>
       <div class="song_img">
-        <img :src="song.album.blurPicUrl" alt />
+        <img :src="ImageLazy" :data-src="song.album.blurPicUrl" alt />
       </div>
       <div>{{song.name}}</div>
       <div>{{getSongerNames(song.artists)}}</div>
@@ -32,20 +32,44 @@
 </template>
 
 <script>
+import ImageLazy from "@/assets/imageLazy.svg";
 export default {
   data() {
     return {
+      selectedType: "0",
       songList: [],
+      ImageLazy,
     };
   },
   mounted() {
     this.getSongsListByType();
   },
   methods: {
+    switchType(type) {
+      this.selectedType = type;
+      this.getSongsListByType(type);
+    },
     getSongsListByType(type) {
-      this.$axios.get(`/top/song?type=${type ? type : 0}`).then((res) => {
-        this.songList = res.data.slice(0, 10);
-      });
+      this.$axios
+        .get(`/top/song?type=${type ? type : 0}`)
+        .then((res) => {
+          this.songList = res.data;
+        })
+        .then(() => {
+          const observer = new IntersectionObserver((items) => {
+            items.forEach((element, index) => {
+              const { target, isIntersecting } = element;
+              if (isIntersecting) {
+                target.src = target.getAttribute("data-src");
+                observer.unobserve(target);
+              }
+            });
+          });
+          const beginObservered = Array.from(
+            document.getElementsByTagName("img")
+          );
+          beginObservered.forEach((element) => observer.observe(element));
+        });
     },
     getSongerNames(data) {
       let str = "";
