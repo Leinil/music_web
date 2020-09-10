@@ -13,25 +13,28 @@
       <span @click="switchType('16')" :class="selectedType==='16'?'active':''">韩国</span>
       <span @click="switchType('8')" :class="selectedType==='8'?'active':''">日本</span>
     </div>
-    <div
-      :class="[index%2===0 ? 'lighter' : '', 'song_list']"
-      v-for="(song,index) in songList"
-      :key="index"
-      @click="getMusicUrl(song.id)"
-    >
-      <div>{{index+1}}</div>
-      <div class="song_img">
-        <img :src="ImageLazy" :data-src="song.album.blurPicUrl" alt />
+    <div id="songlist">
+      <div
+        :class="[index%2===0 ? 'lighter' : '', 'song_list']"
+        v-for="(song,index) in songList"
+        :key="index"
+        @click="getMusicUrl(song.id)"
+      >
+        <div>{{index+1}}</div>
+        <div class="song_img">
+          <img :src="ImageLazy" :data-src="song.album.blurPicUrl" alt />
+        </div>
+        <div>{{song.name}}</div>
+        <div>{{getSongerNames(song.artists)}}</div>
+        <div>{{song.album.name}}</div>
+        <div>{{getTime(song.bMusic.playTime)}}</div>
       </div>
-      <div>{{song.name}}</div>
-      <div>{{getSongerNames(song.artists)}}</div>
-      <div>{{song.album.name}}</div>
-      <div>{{getTime(song.bMusic.playTime)}}</div>
     </div>
   </div>
 </template>
 
 <script>
+import { Loading } from "element-ui";
 import ImageLazy from "@/assets/imageLazy.svg";
 export default {
   data() {
@@ -50,12 +53,19 @@ export default {
       this.getSongsListByType(type);
     },
     getSongsListByType(type) {
+      let loadingInstance = Loading.service({
+        target: "#songlist",
+        background: "rgba(25, 27, 31, 1)",
+        text: "正在加载中",
+      });
+      this.songList = [];
       this.$axios
         .get(`/top/song?type=${type ? type : 0}`)
         .then((res) => {
           this.songList = res.data;
         })
         .then(() => {
+          loadingInstance.close();
           const observer = new IntersectionObserver((items) => {
             items.forEach((element, index) => {
               const { target, isIntersecting } = element;

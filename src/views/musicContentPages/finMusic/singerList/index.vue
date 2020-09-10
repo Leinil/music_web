@@ -30,9 +30,9 @@
         </div>
       </div>
     </div>
-    <div class="show_singer">
+    <div class="show_singer" id="loading">
       <div v-for="(singer,index) in songerList" :key="index" class="singer_border">
-        <img :src="singer.img1v1Url" alt />
+        <img :src="avatar" alt :data-src="singer.img1v1Url" />
         <span>{{singer.name}}</span>
       </div>
     </div>
@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import { Loading } from "element-ui";
+import musicAvatar from "@/assets/musicAvatar.svg";
 export default {
   data() {
     return {
@@ -57,10 +59,11 @@ export default {
         initial: "",
       },
       songerList: [],
+      avatar: musicAvatar,
     };
   },
   mounted() {
-    this.getSongerList(-1,-1,-1)
+    this.getSongerList(-1, -1, -1);
     const typeTransObj = {
       全部: -1,
       男歌手: 1,
@@ -134,14 +137,35 @@ export default {
   },
   methods: {
     getSongerList(type, area, initial) {
+      const loadingInstance = Loading.service({
+        target: "#loading",
+        background: "rgba(25, 27, 31, 1)",
+        text: "正在加载中",
+      });
+      this.songerList = [];
       let url = "/artist/list?";
       type !== "" ? (url += `&type=${type}`) : url;
       area !== "" ? (url += `&area=${area}`) : url;
       initial !== "" ? (url += `&initial=${initial}`) : url;
-      this.$axios.get(url).then((res) => {
-        console.log(res.artists) 
-        this.songerList = res.artists;
-      });
+      this.$axios
+        .get(url)
+        .then((res) => {
+          loadingInstance.close();
+          this.songerList = res.artists;
+        })
+        .then(() => {
+          const imgArr = Array.from(document.getElementsByTagName("img"));
+          const observer = new IntersectionObserver((items) => {
+            items.forEach((element, index) => {
+              const { target, isIntersecting } = element;
+              if (isIntersecting) {
+                target.src = target.getAttribute("data-src");
+                observer.unobserve(target);
+              }
+            });
+          });
+          imgArr.forEach((element) => observer.observe(element));
+        });
     },
   },
 };
